@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Daily Dough: HOA01 to HOA07 Complete Guide & Progress Tracker</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+    margin: 0 auto;
+    padding: 24px;
+    max-width: 900px;
+  }
+  h1 {
+    color: #b45309;
+    border-bottom: 2px solid #fde68a;
+    padding-bottom: 8px;
+    margin-top: 0;
+  }
+  h2 {
+    color: #92400e;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-top: 32px;
+  }
+  h3 {
+    color: #1e293b;
+    margin-top: 20px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background-color: #f8fafc;
+    color: #334155;
+    font-weight: 600;
+  }
+  tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+  code {
+    background-color: #f1f5f9;
+    color: #b45309;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: Consolas, Monaco, "Courier New", monospace;
+    font-size: 13px;
+  }
+  pre {
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 14px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: Consolas, Monaco, "Courier New", monospace;
+    font-size: 13px;
+  }
+  blockquote {
+    border-left: 4px solid #f59e0b;
+    margin: 16px 0;
+    padding: 8px 16px;
+    background-color: #fffbeb;
+    color: #92400e;
+  }
+  .badge-completed {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: #dcfce7;
+    color: #15803d;
+  }
+</style>
+</head>
+<body>
+
+<h1>Daily Dough: HOA01 to HOA07 Complete Guide & Progress Tracker</h1>
+<p><strong>Course:</strong> ITE 7 – Application Development and Emerging Technologies<br>
+<strong>Institution:</strong> University of Rizal System (URS), Binangonan Campus – College of Computer Studies<br>
+<strong>Subject Instructor:</strong> Anjeline N. Legaspi, LPT, MSIT<br>
+<strong>Baseline Academic Manual:</strong> ITE 7 Module.pdf<br>
+<strong>Project Title:</strong> Daily Dough: An On-Demand E-Commerce Platform for Donut Ordering and Delivery</p>
+
+<hr>
+
+<h2>1. Project Overview & Architecture</h2>
+<p><strong>Daily Dough</strong> is an on-demand mobile-commerce (M-Commerce) platform designed for boutique bakery storefronts specializing in artisanal donuts and specialty coffee. The platform bridges customer ordering convenience with streamlined administrative management through two synchronized client applications connected to a single cloud database:</p>
+<ol>
+  <li><strong>Customer Mobile Application:</strong> Developed with Flutter & Dart, supporting registration, catalog browsing, isolated carts, 3-step checkout, and real-time order tracking.</li>
+  <li><strong>Admin Web Application:</strong> Developed with HTML5, CSS3, and JavaScript, providing live sales analytics, product catalog CRUD, customer monitoring, and order status lifecycle updates.</li>
+</ol>
+
+<blockquote>
+  <strong>Architectural Choice: Cloud Firestore vs. Firebase Realtime Database</strong><br>
+  While the ITE 7 Module describes Cloud Firestore, Daily Dough utilizes Firebase Realtime Database (RTDB). Both are official Google Firebase NoSQL products. Realtime Database was selected because its flat JSON tree structure delivers ultra-low latency updates ideal for on-demand food delivery order status tracking.
+</blockquote>
+
+<h2>2. HOA01 – M-Commerce System and Architecture Setup</h2>
+<p><em>Module Reference: Pages 10–15 | Status: <span class="badge-completed">COMPLETED</span></em></p>
+<p><strong>Objective:</strong> Understand system architecture, install development tools, initialize Flutter, connect Firebase, organize folder structure, and create a Git repository.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Required Output</th>
+      <th>Specification</th>
+      <th>Status</th>
+      <th>Evidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Running Flutter App</td>
+      <td>Flutter SDK & default app execution</td>
+      <td>COMPLETED</td>
+      <td><code>mobile_app/lib/main.dart</code> (Flutter 3.13.5 / 3.47)</td>
+    </tr>
+    <tr>
+      <td>Firebase Connected App</td>
+      <td>Establish cloud backend connectivity</td>
+      <td>COMPLETED</td>
+      <td><code>FirebaseService.checkFirebaseConnection()</code></td>
+    </tr>
+    <tr>
+      <td>Organized Folder Structure</td>
+      <td>Modular lib/ organization</td>
+      <td>COMPLETED</td>
+      <td><code>models/</code>, <code>screens/</code>, <code>services/</code></td>
+    </tr>
+    <tr>
+      <td>GitHub Repository</td>
+      <td>Version control setup & commit</td>
+      <td>COMPLETED</td>
+      <td>Branch <code>main</code> with clean <code>.gitignore</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. HOA02 – Database Structuring and Firebase Configuration</h2>
+<p><em>Module Reference: Pages 16–20 | Status: <span class="badge-completed">COMPLETED</span></em></p>
+<p><strong>Objective:</strong> Configure cloud authentication, define database schemas, implement Login/Register screens, and enforce Role-Based Access Control (RBAC).</p>
+<table>
+  <thead>
+    <tr>
+      <th>Required Output</th>
+      <th>Specification</th>
+      <th>Status</th>
+      <th>Evidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Functional Login/Register</td>
+      <td>Forms with validation & password toggle</td>
+      <td>COMPLETED</td>
+      <td><code>login_screen.dart</code>, <code>register_screen.dart</code></td>
+    </tr>
+    <tr>
+      <td>Database Entities</td>
+      <td>Users, Products, and Orders schema</td>
+      <td>COMPLETED</td>
+      <td>RTDB nodes: <code>/users</code>, <code>/customers</code>, <code>/products</code>, <code>/transactions</code></td>
+    </tr>
+    <tr>
+      <td>Role-Based Access Control</td>
+      <td>Customer vs. Administrator separation</td>
+      <td>COMPLETED</td>
+      <td>Mobile app blocks admin; Web dashboard blocks customers</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. HOA03 – Mobile Application Development</h2>
+<p><em>Module Reference: Pages 21–25 | Status: <span class="badge-completed">COMPLETED</span></em></p>
+<p><strong>Objective:</strong> Build the customer storefront: product listing, product details with quantity selector, user-isolated cart, and multi-step checkout.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Required Output</th>
+      <th>Specification</th>
+      <th>Status</th>
+      <th>Evidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Product Listing</td>
+      <td>Dynamic grid with search & category filter</td>
+      <td>COMPLETED</td>
+      <td><code>products_screen.dart</code> (Donuts & Coffee tabs)</td>
+    </tr>
+    <tr>
+      <td>Product Details</td>
+      <td>Description, price & quantity selector</td>
+      <td>COMPLETED</td>
+      <td><code>product_detail_screen.dart</code> (+ / - controls)</td>
+    </tr>
+    <tr>
+      <td>Functional Cart System</td>
+      <td>User-isolated cart & auto-sum</td>
+      <td>COMPLETED</td>
+      <td><code>cart_screen.dart</code> scoped to <code>/carts/{username}</code></td>
+    </tr>
+    <tr>
+      <td>Checkout Process</td>
+      <td>Address input, payment selection, order commit</td>
+      <td>COMPLETED</td>
+      <td><code>checkout_screen.dart</code> (COD, GCash, Card)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. HOA04 – Web-Based Admin Dashboard</h2>
+<p><em>Module Reference: Pages 26–28 | Status: <span class="badge-completed">COMPLETED</span></em></p>
+<p><strong>Objective:</strong> Construct an administrative web dashboard for KPI analytics, product CRUD operations, and order lifecycle management.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Required Output</th>
+      <th>Specification</th>
+      <th>Status</th>
+      <th>Evidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Functional Admin Dashboard</td>
+      <td>Responsive UI with live KPI metrics</td>
+      <td>COMPLETED</td>
+      <td><code>web_dashboard/index.html</code> running on port 5050</td>
+    </tr>
+    <tr>
+      <td>Product CRUD</td>
+      <td>Create, Read, Update, and Delete products</td>
+      <td>COMPLETED</td>
+      <td><code>app.js</code> product form, table, edit modal & delete</td>
+    </tr>
+    <tr>
+      <td>Order Monitoring</td>
+      <td>View orders & update progress status</td>
+      <td>COMPLETED</td>
+      <td>Status dropdown: Pending → Processing → Delivered</td>
+    </tr>
+    <tr>
+      <td>User Monitoring</td>
+      <td>View customer accounts & order counts</td>
+      <td>COMPLETED</td>
+      <td><code>#viewCustomers</code> customer monitoring table</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>6. HOA05 – System Integration</h2>
+<p><em>Module Reference: Pages 29–32 | Status: <span class="badge-completed">COMPLETED</span></em></p>
+<p><strong>Objective:</strong> Synchronize mobile and web applications via the cloud database, enforce data validation, and resolve integration issues.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Required Output</th>
+      <th>Specification</th>
+      <th>Status</th>
+      <th>Evidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Fully Integrated System</td>
+      <td>Shared cloud database between apps</td>
+      <td>COMPLETED</td>
+      <td>Both apps interact with <code>dailydough-5480d-default-rtdb</code></td>
+    </tr>
+    <tr>
+      <td>Real-Time Synchronization</td>
+      <td>Product and order sync across clients</td>
+      <td>COMPLETED</td>
+      <td>Verified by <code>test/admin_added_product_test.dart</code></td>
+    </tr>
+    <tr>
+      <td>Debugging Report</td>
+      <td>Formal documentation of bug fixes</td>
+      <td>COMPLETED</td>
+      <td><code>LAB08_VERIFICATION_REPORT.md</code> (All 3 bugs resolved)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>7. HOA06 – Testing, Optimization, and Deployment</h2>
+<p><em>Module Reference: Pages 33–35 | Status: <span class="badge-completed">COMPLETED</span></em></p>
+<p><strong>Objective:</strong> Execute functional QA testing, collect user survey feedback, compile release Android APK, and deploy admin dashboard.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Required Output</th>
+      <th>Specification</th>
+      <th>Status</th>
+      <th>Evidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>QA Checklist</td>
+      <td>Module verification matrix (Yes/No)</td>
+      <td>COMPLETED</td>
+      <td><code>documents/Daily_Dough_QA_Checklist_and_User_Feedback.md</code></td>
+    </tr>
+    <tr>
+      <td>User Testing Results</td>
+      <td>Peer review survey & usability score</td>
+      <td>COMPLETED</td>
+      <td>Documented in <code>Daily_Dough_QA_Checklist_and_User_Feedback.md</code> (4.8/5.0)</td>
+    </tr>
+    <tr>
+      <td>Release APK File</td>
+      <td>Optimized standalone Android package</td>
+      <td>COMPLETED</td>
+      <td><code>mobile_app/build/app/outputs/flutter-apk/app-release.apk</code> (55.7 MB)</td>
+    </tr>
+    <tr>
+      <td>Deployed Dashboard</td>
+      <td>Web deployment configuration</td>
+      <td>COMPLETED</td>
+      <td><code>.github/workflows/deploy.yml</code> (GitHub Pages) + local server</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>8. HOA07 – Final System Presentation and Defense</h2>
+<p><em>Module Reference: Pages 36–38 | Status: <span class="badge-completed">COMPLETED</span></em></p>
+<p><strong>Objective:</strong> Create presentation slides, master live demonstration sequence, and prepare oral defense reflection answers.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Required Output</th>
+      <th>Specification</th>
+      <th>Status</th>
+      <th>Evidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Presentation Slides</td>
+      <td>9-section slide deck with speaker notes</td>
+      <td>COMPLETED</td>
+      <td><code>documents/Daily_Dough_Final_Presentation_and_Defense_Guide.md</code></td>
+    </tr>
+    <tr>
+      <td>Demonstration Script</td>
+      <td>8-step live walkthrough sequence</td>
+      <td>COMPLETED</td>
+      <td>Documented in <code>Daily_Dough_Final_Presentation_and_Defense_Guide.md</code></td>
+    </tr>
+    <tr>
+      <td>Reflection Answers</td>
+      <td>Answers for 3 defense questions</td>
+      <td>COMPLETED</td>
+      <td>Documented in <code>Daily_Dough_Final_Presentation_and_Defense_Guide.md</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>9. Final Project Submission Master Checklist</h2>
+<p><em>Module Reference: Page 38 | Status: 100% COMPLETE</em></p>
+<ul>
+  <li>✅ <strong>1. Mobile Application:</strong> <code>daily-dough/mobile_app/</code></li>
+  <li>✅ <strong>2. Web Admin Dashboard:</strong> <code>daily-dough/web_dashboard/</code></li>
+  <li>✅ <strong>3. Firebase Integration:</strong> <code>https://dailydough-5480d-default-rtdb.firebaseio.com/</code></li>
+  <li>✅ <strong>4. GitHub Repository:</strong> Local Git repository on branch <code>main</code> with deployment workflow</li>
+  <li>✅ <strong>5. Documentation:</strong> <code>documents/Daily_Dough_Project_Documentation.md</code></li>
+  <li>✅ <strong>6. Presentation Slides:</strong> <code>documents/Daily_Dough_Final_Presentation_and_Defense_Guide.md</code></li>
+  <li>✅ <strong>7. APK File:</strong> <code>mobile_app/build/app/outputs/flutter-apk/app-release.apk</code> (55.7 MB)</li>
+</ul>
+
+</body>
+</html>
