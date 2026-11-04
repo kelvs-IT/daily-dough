@@ -7,7 +7,6 @@ import 'package:mobile_app/services/firebase_service.dart';
 void main() {
   testWidgets('DailyDoughApp smoke test with official logo verification', (WidgetTester tester) async {
     await tester.pumpWidget(const DailyDoughApp());
-    expect(find.text('Daily Dough'), findsOneWidget);
     expect(find.text('Login'), findsOneWidget);
 
     // Verify official Daily Dough logo is rendered on LoginScreen

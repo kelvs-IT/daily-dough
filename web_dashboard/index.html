@@ -11,26 +11,11 @@
 </head>
 <body>
 
-  <!-- 1. LOGIN SCREEN VIEW (TWO-SECTION LAYOUT) -->
+  <!-- 1. FULLSCREEN TWO-COLUMN ADMIN LOGIN VIEW -->
   <div id="viewLogin" class="login-wrapper view-section active">
-    <div class="login-split-card">
-      <!-- Left Section: Store Branding -->
-      <div class="login-branding-panel">
-        <div class="branding-content">
-          <div class="branding-logo-wrap">
-            <img src="images/daily_dough.png" alt="Daily Dough Logo" class="branding-logo">
-          </div>
-          <h2 class="branding-title">Daily Dough</h2>
-          <p class="branding-tagline">Coffee &bull; Donuts</p>
-          <div class="branding-divider"></div>
-          <p class="branding-desc">
-            Freshly handcrafted artisan donuts and specialty brewed coffee. Store administrator operations, live order fulfillment, and menu management.
-          </p>
-        </div>
-      </div>
-
-      <!-- Right Section: Login Form -->
-      <div class="login-form-panel">
+    <!-- Left Section: Login Form (Background: #fdb3c4) -->
+    <div class="login-left-section">
+      <div class="login-form-container">
         <div class="form-header">
           <h3>Administrator Sign In</h3>
           <p class="text-muted">Enter administrative credentials to access store controls</p>
@@ -52,13 +37,28 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 600;">Sign in to Dashboard</button>
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px; font-weight: 600; font-size: 15px;">Sign in to Dashboard</button>
         </form>
 
         <div class="login-customer-notice">
           <strong>📱 Customer Notice:</strong><br>
           Customers must use the <strong>Daily Dough Customer Mobile App</strong>. This portal is strictly restricted to store administrators.
         </div>
+      </div>
+    </div>
+
+    <!-- Right Section: Store Branding (Background: #e8d7b7) -->
+    <div class="login-right-section">
+      <div class="branding-content">
+        <div class="branding-logo-wrap">
+          <img src="images/daily_dough.png" alt="Daily Dough Logo" class="branding-logo">
+        </div>
+        <h2 class="branding-title">Daily Dough</h2>
+        <p class="branding-tagline">Coffee &bull; Donuts</p>
+        <div class="branding-divider"></div>
+        <p class="branding-desc">
+          Freshly handcrafted artisan donuts and specialty brewed coffee. Store administrator operations, live order fulfillment, and menu management.
+        </p>
       </div>
     </div>
   </div>

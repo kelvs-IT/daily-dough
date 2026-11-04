@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (username.isEmpty) {
       setState(() {
-        _errorMessage = 'Username cannot be empty';
+        _errorMessage = 'Email cannot be empty';
       });
       return;
     }
@@ -99,26 +99,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     Center(
                       child: Image.asset(
                         'assets/images/daily_dough.png',
-                        height: 72,
+                        height: 84,
                         fit: BoxFit.contain,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      'Daily Dough',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1E293B),
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Firebase Integration System',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFF64748B),
                       ),
                     ),
                     const SizedBox(height: 28),
@@ -153,10 +135,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     TextFormField(
                       controller: _usernameController,
+                      keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        labelText: 'Username',
+                        labelText: 'Email',
                         hintText: '',
-                        prefixIcon: const Icon(Icons.person_outline),
+                        prefixIcon: const Icon(Icons.email_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         filled: true,
                         fillColor: Colors.grey.shade50,
@@ -219,7 +202,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         backgroundColor: Colors.white,
                       ),
                       onPressed: () {
-                        // For now no action
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Google Sign-In integration in standby. Please log in with your email & password.'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

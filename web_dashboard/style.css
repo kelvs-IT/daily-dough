@@ -687,105 +687,119 @@ h1, h2, h3, h4 {
   border-radius: 6px;
 }
 
-/* Two-Section Admin Login Layout */
-.login-wrapper {
+/* Fullscreen Two-Column Admin Login Layout */
+#viewLogin.login-wrapper {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
   min-height: 100vh;
-  padding: 24px;
-  background: #f4efe9;
-  position: relative;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background: none;
 }
 
-.login-split-card {
-  display: flex;
-  width: 100%;
-  max-width: 860px;
-  min-height: 500px;
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 16px 36px rgba(29, 18, 12, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  position: relative;
-  z-index: 2;
-}
-
-.login-branding-panel {
-  flex: 1.1;
-  background: linear-gradient(145deg, #241812 0%, #170d08 100%);
-  color: #f5f0eb;
-  padding: 48px 40px;
+/* Left Section: Login Form (Background: #fdb3c4) */
+.login-left-section {
+  flex: 1;
+  width: 50%;
+  height: 100%;
+  background-color: #fdb3c4;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 40px;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
-.branding-content {
-  max-width: 330px;
-  text-align: center;
-}
-
-.branding-logo-wrap {
-  margin-bottom: 18px;
-}
-
-.branding-logo {
-  height: 110px;
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
-}
-
-.branding-title {
-  font-size: 26px;
-  color: #ffffff;
-  font-weight: 700;
-  margin-bottom: 2px;
-}
-
-.branding-tagline {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 2.2px;
-  color: var(--accent);
-  font-weight: 600;
-  margin-bottom: 18px;
-}
-
-.branding-divider {
-  width: 44px;
-  height: 2px;
-  background: var(--accent);
-  margin: 0 auto 18px;
-  opacity: 0.8;
-}
-
-.branding-desc {
-  font-size: 13px;
-  line-height: 1.6;
-  color: #c9bbae;
-}
-
-.login-form-panel {
-  flex: 1.2;
-  padding: 44px 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.login-form-container {
+  width: 100%;
+  max-width: 420px;
   background: #ffffff;
+  padding: 38px 34px;
+  border-radius: 20px;
+  box-shadow: 0 16px 36px rgba(180, 83, 9, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
 }
 
-.form-header {
+.login-form-container .form-header {
   margin-bottom: 22px;
 }
 
-.form-header h3 {
-  font-size: 20px;
+.login-form-container .form-header h3 {
+  font-size: 22px;
   color: var(--text-main);
   margin-bottom: 4px;
+  font-weight: 700;
+}
+
+/* Right Section: Store Branding (Background: #e8d7b7) */
+.login-right-section {
+  flex: 1;
+  width: 50%;
+  height: 100%;
+  background-color: #e8d7b7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.login-right-section .branding-content {
+  max-width: 420px;
+  text-align: center;
+}
+
+.login-right-section .branding-logo-wrap {
+  margin-bottom: 20px;
+}
+
+.login-right-section .branding-logo {
+  height: 130px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(146, 64, 14, 0.18));
+}
+
+.login-right-section .branding-title {
+  font-size: 30px;
+  color: #451a03;
+  font-weight: 800;
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+
+.login-right-section .branding-tagline {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.8px;
+  color: #92400e;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.login-right-section .branding-divider {
+  width: 48px;
+  height: 3px;
+  background: #b45309;
+  margin: 0 auto 18px;
+  border-radius: 2px;
+}
+
+.login-right-section .branding-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #573318;
+  font-weight: 500;
 }
 
 .login-customer-notice {
@@ -799,19 +813,23 @@ h1, h2, h3, h4 {
   line-height: 1.5;
 }
 
-@media (max-width: 768px) {
-  .login-split-card {
-    flex-direction: column;
-    max-width: 440px;
+@media (max-width: 860px) {
+  #viewLogin.login-wrapper {
+    flex-direction: column-reverse;
+    overflow-y: auto;
+    position: static;
+    height: auto;
+    min-height: 100vh;
   }
-  .login-branding-panel {
-    padding: 32px 24px;
+  .login-left-section,
+  .login-right-section {
+    width: 100%;
+    flex: none;
+    min-height: 50vh;
+    padding: 36px 20px;
   }
-  .branding-logo {
-    height: 80px;
-  }
-  .login-form-panel {
-    padding: 32px 24px;
+  .login-right-section .branding-logo {
+    height: 90px;
   }
 }
 

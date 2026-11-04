@@ -14,19 +14,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
   String? _errorMessage;
   bool _isLoading = false;
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
     _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -38,10 +35,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final fullName = _fullNameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-    final confirmPassword = _confirmPasswordController.text.trim();
 
     if (fullName.isEmpty) {
-      setState(() => _errorMessage = 'Please enter your full name');
+      setState(() => _errorMessage = 'Please enter your name');
       return;
     }
     if (email.isEmpty) {
@@ -61,10 +57,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       setState(() => _errorMessage = 'Password must be at least 6 characters');
       return;
     }
-    if (password != confirmPassword) {
-      setState(() => _errorMessage = 'Passwords do not match');
-      return;
-    }
 
     setState(() => _isLoading = true);
 
@@ -72,7 +64,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       fullName: fullName,
       email: email,
       password: password,
-      confirmPassword: confirmPassword,
+      confirmPassword: password,
     );
 
     setState(() => _isLoading = false);
@@ -155,26 +147,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Center(
                       child: Image.asset(
                         'assets/images/daily_dough.png',
-                        height: 64,
+                        height: 84,
                         fit: BoxFit.contain,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                     Text(
-                      'Create Customer Account',
+                      'Sign Up',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF1E293B),
                         letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Join Daily Dough for exclusive treats & easy ordering',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFF64748B),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -210,7 +194,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     TextFormField(
                       controller: _fullNameController,
                       decoration: InputDecoration(
-                        labelText: 'Full Name',
+                        labelText: 'Name',
                         hintText: 'e.g. Kelvin Santos',
                         prefixIcon: const Icon(Icons.person_outline),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -224,7 +208,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        labelText: 'Email Address',
+                        labelText: 'Email',
                         hintText: 'e.g. kelvin@example.com',
                         prefixIcon: const Icon(Icons.email_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -250,32 +234,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onPressed: () {
                             setState(() {
                               _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                        ),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        filled: true,
-                        fillColor: Colors.grey.shade50,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-
-                    TextFormField(
-                      controller: _confirmPasswordController,
-                      obscureText: _obscureConfirmPassword,
-                      decoration: InputDecoration(
-                        labelText: 'Confirm Password',
-                        hintText: 'Re-enter your password',
-                        prefixIcon: const Icon(Icons.lock_reset_outlined),
-                        suffixIcon: IconButton(
-                          tooltip: _obscureConfirmPassword ? 'Show password' : 'Hide password',
-                          icon: Icon(
-                            _obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                            color: const Color(0xFF64748B),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureConfirmPassword = !_obscureConfirmPassword;
                             });
                           },
                         ),
@@ -330,6 +288,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: const BorderSide(color: Color(0xFFCBD5E1)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        backgroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Google Sign-In integration in standby. Please register with your email & password.'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.network(
+                            'https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png',
+                            height: 20,
+                            width: 20,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.g_mobiledata, size: 22, color: Color(0xFF4285F4)),
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Sign up with Google',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1E293B),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

@@ -16,12 +16,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final usernameField = find.widgetWithText(TextFormField, 'Username');
+      final emailField = find.widgetWithText(TextFormField, 'Email');
       final passwordField = find.widgetWithText(TextFormField, 'Password');
       final loginBtn = find.widgetWithText(ElevatedButton, 'Login');
 
       // Attempt admin login
-      await tester.enterText(usernameField, 'admin');
+      await tester.enterText(emailField, 'admin');
       await tester.enterText(passwordField, 'admin123');
       await tester.tap(loginBtn);
       await tester.pumpAndSettle();
