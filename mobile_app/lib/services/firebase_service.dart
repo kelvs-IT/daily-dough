@@ -892,23 +892,24 @@ class FirebaseService extends ChangeNotifier {
     );
 
     // Save to Firebase /orders (Step 8) and /transactions (dual compatibility)
+    // using the exact same unique key to keep them in 100% sync
     bool saveSuccess = false;
+    final String sharedKey = tx.id;
     try {
       final orderMap = tx.toJson();
-      final res = await http.post(
-        Uri.parse('$databaseUrl/orders.json'),
+      final resOrders = await http.put(
+        Uri.parse('$databaseUrl/orders/$sharedKey.json'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(orderMap),
       ).timeout(const Duration(seconds: 5));
 
-      // Also mirror to /transactions
-      await http.post(
-        Uri.parse('$databaseUrl/transactions.json'),
+      final resTx = await http.put(
+        Uri.parse('$databaseUrl/transactions/$sharedKey.json'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(orderMap),
       ).timeout(const Duration(seconds: 5));
 
-      if (res.statusCode == 200) {
+      if (resOrders.statusCode == 200 || resTx.statusCode == 200) {
         saveSuccess = true;
       }
     } catch (_) {}

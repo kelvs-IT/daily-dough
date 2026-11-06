@@ -912,13 +912,57 @@ async function handleAdminChangeOrderStatus(orderId, newStatus) {
   order.status = newStatus;
 
   try {
-    const res = await fetch(`${FIREBASE_BASE_URL}/transactions/${orderId}.json`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus })
-    });
-    if (!res.ok) {
-      console.warn('Firebase PATCH returned status', res.status);
+    // 1. Update under /orders and /transactions by the node's push key (orderId)
+    await Promise.allSettled([
+      fetch(`${FIREBASE_BASE_URL}/orders/${orderId}.json`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      }),
+      fetch(`${FIREBASE_BASE_URL}/transactions/${orderId}.json`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      })
+    ]);
+
+    // 2. Also search and update any paired record with matching internal orderId (tx_...)
+    const targetInternalId = order.orderId;
+    if (targetInternalId) {
+      try {
+        const [ordersRes, txRes] = await Promise.all([
+          fetch(`${FIREBASE_BASE_URL}/orders.json`),
+          fetch(`${FIREBASE_BASE_URL}/transactions.json`)
+        ]);
+        if (ordersRes.ok) {
+          const oData = await ordersRes.json();
+          if (oData && typeof oData === 'object') {
+            for (const k of Object.keys(oData)) {
+              if (oData[k] && oData[k].orderId === targetInternalId && k !== orderId) {
+                await fetch(`${FIREBASE_BASE_URL}/orders/${k}.json`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ status: newStatus })
+                });
+              }
+            }
+          }
+        }
+        if (txRes.ok) {
+          const tData = await txRes.json();
+          if (tData && typeof tData === 'object') {
+            for (const k of Object.keys(tData)) {
+              if (tData[k] && tData[k].orderId === targetInternalId && k !== orderId) {
+                await fetch(`${FIREBASE_BASE_URL}/transactions/${k}.json`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ status: newStatus })
+                });
+              }
+            }
+          }
+        }
+      } catch (_) {}
     }
   } catch (err) {
     console.error('Firebase PATCH error:', err);
