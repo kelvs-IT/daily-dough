@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "662178737628",
+    "firebase_url": "https://dailydough-5480d-default-rtdb.firebaseio.com",
+    "project_id": "dailydough-5480d",
+    "storage_bucket": "dailydough-5480d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:662178737628:android:d85cc16b2be512a9af3319",
+        "android_client_info": {
+          "package_name": "com.dailydough.mobile_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "662178737628-g42f0tq68ri598olondqnm0vngve7uvt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdHyQ5DJQWXTFb4hpru0EERfV3zb7Aaxk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "662178737628-g42f0tq68ri598olondqnm0vngve7uvt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

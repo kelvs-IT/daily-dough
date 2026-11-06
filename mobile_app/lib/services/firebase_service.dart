@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/product.dart';
 import '../models/cart_item.dart';
 import '../models/transaction.dart';
@@ -206,6 +209,172 @@ class FirebaseService extends ChangeNotifier {
     }
   }
 
+  // --- Google Sign-In Authentication (Mobile Customer Access) ---
+  Future<Map<String, dynamic>> signInWithGoogle() async {
+    try {
+      // 1. Trigger the Google Authentication account picker
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId: '662178737628-g42f0tq68ri598olondqnm0vngve7uvt.apps.googleusercontent.com',
+        scopes: ['email', 'profile'],
+      );
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        // Customer dismissed or cancelled the Google account chooser
+        return {'success': false, 'error': 'Google Sign-In was cancelled by the user.'};
+      }
+
+      final String email = googleUser.email.trim();
+      final String displayName = (googleUser.displayName ?? '').trim();
+      final String photoUrl = googleUser.photoUrl ?? '';
+
+      // 2. Strict Role Enforcement (Part 3 & 5):
+      // The mobile application is exclusively for customer accounts.
+      // Store administrators are not permitted to log into the mobile app.
+      if (email.toLowerCase().startsWith('admin') ||
+          email.toLowerCase() == 'admin@dailydough.com' ||
+          email.toLowerCase() == 'admin@gmail.com') {
+        try {
+          await googleSignIn.signOut();
+        } catch (_) {}
+        return {
+          'success': false,
+          'error': 'Admin accounts must use the Daily Dough Web Application. The mobile app is exclusively for customers.'
+        };
+      }
+
+      // Check Firebase RTDB /users node to verify if account is configured as admin
+      try {
+        final res = await http
+            .get(Uri.parse('$databaseUrl/users.json'))
+            .timeout(const Duration(seconds: 4));
+
+        if (res.statusCode == 200 && res.body != 'null') {
+          final Map<String, dynamic> data = json.decode(res.body);
+          for (var entry in data.values) {
+            if (entry is Map) {
+              final uName = entry['username']?.toString().trim().toLowerCase() ?? '';
+              final uEmail = entry['email']?.toString().trim().toLowerCase() ?? '';
+              final uRole = entry['role']?.toString().trim().toLowerCase() ?? '';
+              if ((uName == 'admin' || uRole == 'admin') && uEmail == email.toLowerCase()) {
+                try {
+                  await googleSignIn.signOut();
+                } catch (_) {}
+                return {
+                  'success': false,
+                  'error': 'Admin accounts must use the Daily Dough Web Application. The mobile app is exclusively for customers.'
+                };
+              }
+            }
+          }
+        }
+      } catch (_) {}
+
+      // 3. Authenticate with Firebase Authentication Credential if available
+      try {
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        if (googleAuth.idToken != null || googleAuth.accessToken != null) {
+          final AuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
+          if (Firebase.apps.isNotEmpty) {
+            await FirebaseAuth.instance.signInWithCredential(credential);
+          }
+        }
+      } catch (authErr) {
+        debugPrint('Firebase Auth credential note: $authErr');
+      }
+
+      // 4. Verify / Upsert Customer in Realtime Database (/customers)
+      String matchedUsername = '';
+      bool customerExists = false;
+      try {
+        final res = await http
+            .get(Uri.parse('$databaseUrl/customers.json'))
+            .timeout(const Duration(seconds: 4));
+
+        if (res.statusCode == 200 && res.body != 'null') {
+          final Map<String, dynamic> data = json.decode(res.body);
+          for (var entry in data.values) {
+            if (entry is Map) {
+              final cEmail = entry['email']?.toString().trim().toLowerCase() ?? '';
+              if (cEmail == email.toLowerCase()) {
+                customerExists = true;
+                matchedUsername = entry['username']?.toString().trim() ?? '';
+                break;
+              }
+            }
+          }
+        }
+      } catch (_) {}
+
+      final baseUsername = email.contains('@') ? email.split('@').first : email;
+      final assignedUsername = matchedUsername.isNotEmpty ? matchedUsername : baseUsername;
+
+      if (!customerExists) {
+        final newCustomerRecord = {
+          'accountType': 'Customer',
+          'authProvider': 'google',
+          'email': email,
+          'fullName': displayName.isNotEmpty ? displayName : baseUsername,
+          'username': assignedUsername,
+          'createdAt': DateTime.now().toIso8601String(),
+          'avatar': photoUrl,
+          'phone': '',
+        };
+        try {
+          await http.post(
+            Uri.parse('$databaseUrl/customers.json'),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(newCustomerRecord),
+          );
+          // Also persist under /users for Step 6 Users collection & RBAC compliance
+          await http.post(
+            Uri.parse('$databaseUrl/users.json'),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode({
+              'username': assignedUsername,
+              'name': displayName.isNotEmpty ? displayName : baseUsername,
+              'fullName': displayName.isNotEmpty ? displayName : baseUsername,
+              'email': email,
+              'role': 'user',
+              'authProvider': 'google',
+            }),
+          );
+        } catch (e) {
+          debugPrint('Customer record upsert note: $e');
+        }
+      }
+
+      // 5. Update local customer session state
+      _isLoggedIn = true;
+      _currentUsername = assignedUsername;
+      _profileFullName = displayName.isNotEmpty ? displayName : assignedUsername;
+      _profileEmail = email;
+      if (photoUrl.isNotEmpty) {
+        _profileAvatar = photoUrl;
+      }
+
+      await fetchCart();
+      await fetchCustomerOrders();
+      await fetchUserProfile();
+      notifyListeners();
+
+      return {'success': true, 'username': _currentUsername};
+
+    } catch (e) {
+      debugPrint('Google Sign-In caught error: $e');
+      String msg = 'Google Sign-In failed: $e';
+      if (e.toString().contains('sign_in_failed') || e.toString().contains('ApiException: 10')) {
+        msg = 'Google Sign-In setup pending: Verify SHA-1 fingerprint and Google provider in Firebase Console.';
+      } else if (e.toString().contains('network_error')) {
+        msg = 'Network connection unavailable. Please check your internet connection.';
+      }
+      return {'success': false, 'error': msg};
+    }
+  }
+
   void logout() {
     _isLoggedIn = false;
     _currentUsername = '';
@@ -216,6 +385,12 @@ class FirebaseService extends ChangeNotifier {
     _userAddresses.clear();
     _cachedCart.clear();
     _cachedTransactions.clear();
+    try {
+      GoogleSignIn().signOut();
+    } catch (_) {}
+    try {
+      FirebaseAuth.instance.signOut();
+    } catch (_) {}
     notifyListeners();
   }
 
@@ -310,15 +485,17 @@ class FirebaseService extends ChangeNotifier {
         body: json.encode(customerData),
       ).timeout(const Duration(seconds: 5));
 
-      // Also create under /users for unified authentication compatibility
+      // Also create under /users for unified authentication compatibility and Step 6 RBAC
       await http.post(
         Uri.parse('$databaseUrl/users.json'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'username': customerData['username'],
+          'name': cleanName,
+          'fullName': cleanName,
           'email': cleanEmail,
           'password': cleanPassword,
-          'fullName': cleanName,
+          'role': 'user',
         }),
       ).timeout(const Duration(seconds: 5));
 
@@ -391,12 +568,16 @@ class FirebaseService extends ChangeNotifier {
     required double price,
     String details = '',
     String imageUrl = '',
+    int stock = 50,
   }) async {
     final newProductMap = {
       'name': name.trim(),
+      'productName': name.trim(),
       'price': price,
       'details': details.trim(),
+      'description': details.trim(),
       'imageUrl': imageUrl.trim(),
+      'stock': stock,
     };
 
     try {
@@ -409,7 +590,7 @@ class FirebaseService extends ChangeNotifier {
       if (res.statusCode == 200 && res.body.isNotEmpty) {
         final decoded = json.decode(res.body);
         final String newId = decoded['name'] ?? 'prod_${DateTime.now().millisecondsSinceEpoch}';
-        _cachedProducts.insert(0, Product(id: newId, name: name, price: price, details: details, imageUrl: imageUrl.trim()));
+        _cachedProducts.insert(0, Product(id: newId, name: name, price: price, details: details, imageUrl: imageUrl.trim(), stock: stock));
         notifyListeners();
         return true;
       }
@@ -417,7 +598,7 @@ class FirebaseService extends ChangeNotifier {
 
     // Local fallback if offline
     final String fallbackId = 'prod_${DateTime.now().millisecondsSinceEpoch}';
-    _cachedProducts.insert(0, Product(id: fallbackId, name: name, price: price, details: details, imageUrl: imageUrl.trim()));
+    _cachedProducts.insert(0, Product(id: fallbackId, name: name, price: price, details: details, imageUrl: imageUrl.trim(), stock: stock));
     notifyListeners();
     return true;
   }
@@ -596,9 +777,16 @@ class FirebaseService extends ChangeNotifier {
     }
 
     try {
-      final res = await http
-          .get(Uri.parse('$databaseUrl/transactions.json'))
+      // Step 8 Orders Node with /transactions fallback
+      http.Response res = await http
+          .get(Uri.parse('$databaseUrl/orders.json'))
           .timeout(const Duration(seconds: 4));
+
+      if (res.statusCode != 200 || res.body == 'null') {
+        res = await http
+            .get(Uri.parse('$databaseUrl/transactions.json'))
+            .timeout(const Duration(seconds: 4));
+      }
 
       if (res.statusCode == 200 && res.body != 'null') {
         final dynamic data = json.decode(res.body);
@@ -651,6 +839,11 @@ class FirebaseService extends ChangeNotifier {
 
       try {
         await http.patch(
+          Uri.parse('$databaseUrl/orders/$orderId.json'),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({'status': newStatus}),
+        ).timeout(const Duration(seconds: 4));
+        await http.patch(
           Uri.parse('$databaseUrl/transactions/$orderId.json'),
           headers: {'Content-Type': 'application/json'},
           body: json.encode({'status': newStatus}),
@@ -698,13 +891,21 @@ class FirebaseService extends ChangeNotifier {
       items: itemSummaries,
     );
 
-    // Save to Firebase /transactions
+    // Save to Firebase /orders (Step 8) and /transactions (dual compatibility)
     bool saveSuccess = false;
     try {
+      final orderMap = tx.toJson();
       final res = await http.post(
+        Uri.parse('$databaseUrl/orders.json'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(orderMap),
+      ).timeout(const Duration(seconds: 5));
+
+      // Also mirror to /transactions
+      await http.post(
         Uri.parse('$databaseUrl/transactions.json'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(tx.toJson()),
+        body: json.encode(orderMap),
       ).timeout(const Duration(seconds: 5));
 
       if (res.statusCode == 200) {

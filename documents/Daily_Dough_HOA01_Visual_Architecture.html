@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Dough – HOA01 M-Commerce System & Architecture Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      securityLevel: 'loose',
+      fontFamily: 'Inter, sans-serif',
+      themeVariables: {
+        primaryColor: '#FEF3C7',
+        primaryTextColor: '#78350F',
+        primaryBorderColor: '#D97706',
+        lineColor: '#B45309',
+        secondaryColor: '#FFF1F2',
+        tertiaryColor: '#F8FAFC'
+      }
+    });
+  </script>
+  <style>
+    :root {
+      --primary: #D97706;
+      --primary-dark: #B45309;
+      --espresso: #241812;
+      --espresso-light: #3E2723;
+      --cream: #FFFDF9;
+      --cream-alt: #FDF6EE;
+      --blush: #FDB3C4;
+      --blush-light: #FFF1F2;
+      --text-main: #1F2937;
+      --text-muted: #6B7280;
+      --border-color: #EADFD5;
+      --shadow: 0 4px 12px rgba(36, 24, 18, 0.06);
+      --shadow-lg: 0 10px 25px rgba(36, 24, 18, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--cream);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+    }
+
+    header.doc-header {
+      background: linear-gradient(135deg, #241812 0%, #3E2723 100%);
+      color: #ffffff;
+      padding: 40px 24px;
+      text-align: center;
+      border-bottom: 4px solid var(--primary);
+    }
+
+    .doc-header .header-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .doc-header .brand-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 42px;
+      color: var(--blush);
+      font-weight: 700;
+    }
+
+    .doc-header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .doc-header .meta-bar {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 18px;
+      font-size: 13.5px;
+      color: #D7CCC8;
+      margin-top: 14px;
+    }
+
+    .meta-bar span {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 9999px;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 36px 20px 80px 20px;
+    }
+
+    /* Executive Callout Card */
+    .callout-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-left: 5px solid var(--primary);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 36px;
+      box-shadow: var(--shadow);
+    }
+
+    .callout-card h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      color: var(--espresso);
+      margin-bottom: 10px;
+    }
+
+    /* Legend Bar */
+    .legend-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px 24px;
+      margin-bottom: 36px;
+      box-shadow: var(--shadow);
+    }
+
+    .legend-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--espresso);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .legend-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .legend-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .color-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .swatch-mobile { background: #FEF3C7; border-color: #D97706; }
+    .swatch-web { background: #EFEBE9; border-color: #4E342E; }
+    .swatch-cloud { background: #FFFBEB; border-color: #F59E0B; }
+    .swatch-db { background: #EFF6FF; border-color: #2563EB; }
+    .swatch-actor { background: #FFF1F2; border-color: #F43F5E; }
+
+    /* Section & Diagram Cards */
+    .diagram-section {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 40px;
+      box-shadow: var(--shadow);
+      page-break-inside: avoid;
+    }
+
+    .diagram-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--cream-alt);
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+    }
+
+    .diagram-header h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      color: var(--espresso);
+    }
+
+    .diagram-badge {
+      background: var(--cream-alt);
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #EADFD5;
+    }
+
+    .diagram-wrapper {
+      background: #FAFAFA;
+      border: 1px solid #F0ECE7;
+      border-radius: 12px;
+      padding: 24px 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+
+    .diagram-wrapper .mermaid {
+      width: 100%;
+      text-align: center;
+    }
+
+    .explanation-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 850px) {
+      .explanation-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .explanation-block {
+      background: #FFFDF9;
+      border: 1px solid #F2E9E1;
+      border-radius: 10px;
+      padding: 16px 20px;
+    }
+
+    .explanation-block h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--espresso);
+      margin-bottom: 8px;
+    }
+
+    .explanation-block p, .explanation-block ul {
+      font-size: 13.5px;
+      color: #374151;
+      line-height: 1.55;
+    }
+
+    .explanation-block ul {
+      padding-left: 20px;
+      margin-top: 6px;
+    }
+
+    .explanation-block li {
+      margin-bottom: 4px;
+    }
+
+    .defense-alert {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-top: 20px;
+    }
+
+    .defense-alert h4 {
+      color: #1E40AF;
+      font-size: 14.5px;
+      margin-bottom: 6px;
+    }
+
+    .defense-alert p {
+      font-size: 13.5px;
+      color: #1E3A8A;
+      line-height: 1.5;
+    }
+
+    /* Print Formatting */
+    @media print {
+      body {
+        background: #ffffff;
+        color: #000000;
+      }
+      header.doc-header {
+        background: #241812 !important;
+        color: #ffffff !important;
+        padding: 24px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .diagram-section {
+        box-shadow: none;
+        border: 1px solid #cccccc;
+        page-break-after: always;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Official Header -->
+  <header class="doc-header">
+    <div class="header-brand">
+      <span class="brand-title">Daily Dough</span>
+    </div>
+    <h1>HOA01: M-Commerce System & Architecture Setup</h1>
+    <p style="font-size: 16px; color: #EADFD5; max-width: 760px; margin: 0 auto;">
+      Academic System Architecture Specification, Data Communication Flow, and Tiered Design Breakdown
+    </p>
+    <div class="meta-bar">
+      <span>🏛️ <strong>Institution:</strong> University of Rizal System (URS)</span>
+      <span>📚 <strong>Course:</strong> ITE 7 – Application Development & Emerging Technologies</span>
+      <span>👩‍🏫 <strong>Instructor:</strong> Anjeline N. Legaspi, LPT, MSIT</span>
+      <span>📄 <strong>Activity:</strong> Hands-On Activity 01 (HOA01)</span>
+    </div>
+  </header>
+
+  <div class="main-container">
+
+    <!-- Executive Summary Card -->
+    <div class="callout-card">
+      <h2>Project Overview & Executive Summary</h2>
+      <p>
+        <strong>Daily Dough</strong> is an on-demand mobile commerce platform specializing in artisanal handcrafted donuts and specialty espresso drinks. The platform employs a modern <strong>Three-Tier M-Commerce Architecture</strong> designed to provide seamless customer purchasing on Android mobile devices alongside complete managerial visibility and control for store administrators via a responsive web dashboard.
+      </p>
+      <div class="defense-alert" style="margin-top: 14px;">
+        <h4>📘 Academic Architecture Note: Cloud Firestore vs. Realtime Database</h4>
+        <p>
+          While the baseline <em>ITE 7 Module</em> introduces Cloud Firestore, the Daily Dough platform implements <strong>Firebase Realtime Database (RTDB)</strong> via persistent REST/HTTP communication. This architectural choice delivers ultra-low-latency order lifecycle synchronization (Pending &rarr; Processing &rarr; Delivered) and enables the Single Page Web Dashboard to run efficiently with zero external library overhead.
+        </p>
+      </div>
+    </div>
+
+    <!-- Visual Legend Card -->
+    <div class="legend-card">
+      <div class="legend-title">Visual Representation Legend</div>
+      <div class="legend-items">
+        <div class="legend-pill"><span class="color-swatch swatch-actor"></span> Human Actors & Roles (Pink)</div>
+        <div class="legend-pill"><span class="color-swatch swatch-mobile"></span> Mobile Flutter Client (Caramel/Amber)</div>
+        <div class="legend-pill"><span class="color-swatch swatch-web"></span> Web Admin Dashboard (Espresso Brown)</div>
+        <div class="legend-pill"><span class="color-swatch swatch-cloud"></span> Firebase Cloud Services (Gold)</div>
+        <div class="legend-pill"><span class="color-swatch swatch-db"></span> Realtime Database Endpoints (Blue)</div>
+      </div>
+    </div>
+
+    <!-- 1. DIAGRAM A: OVERALL SYSTEM ARCHITECTURE -->
+    <section class="diagram-section" id="diagram-a">
+      <div class="diagram-header">
+        <h2>Diagram A: Overall System Architecture</h2>
+        <span class="diagram-badge">Three-Tier Architecture</span>
+      </div>
+
+      <div class="diagram-wrapper">
+        <pre class="mermaid">
+flowchart TD
+    classDef actorStyle fill:#FFF1F2,stroke:#F43F5E,stroke-width:2px,color:#881337;
+    classDef mobileStyle fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#78350F;
+    classDef webStyle fill:#EFEBE9,stroke:#4E342E,stroke-width:2px,color:#271C19;
+    classDef cloudStyle fill:#FFFBEB,stroke:#F59E0B,stroke-width:2px,color:#78350F;
+    classDef dbStyle fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#1E3A8A;
+
+    subgraph Stakeholders["End Users & Stakeholders"]
+        CustomerUser["Customer (Mobile Phone User)"]:::actorStyle
+        AdminUser["Store Administrator (Desk Manager)"]:::actorStyle
+    end
+
+    subgraph ClientLayer["Frontend Client Tier"]
+        subgraph MobileApp["Daily Dough Flutter Mobile App (Android)"]
+            direction TB
+            MobileUI["Customer UI Presentation Layer\n(Screens & Interactive Widgets)"]:::mobileStyle
+            MobileLogic["FirebaseService (State Manager)\n(ChangeNotifier & Data Caching)"]:::mobileStyle
+            MobileUI <--> MobileLogic
+        end
+
+        subgraph WebApp["Daily Dough Web Admin Dashboard (SPA)"]
+            direction TB
+            WebUI["Administrator Interface\n(admin.html & style.css)"]:::webStyle
+            WebLogic["Admin Dashboard Controller\n(app.js - State, Routing & Actions)"]:::webStyle
+            WebUI <--> WebLogic
+        end
+    end
+
+    subgraph CloudLayer["Google Firebase Cloud Services Tier (dailydough-5480d)"]
+        subgraph AuthServices["Firebase Identity & Access Management"]
+            EmailAuth["Email / Password Authentication"]:::cloudStyle
+            GoogleOAuth["Google Sign-In (OAuth 2.0 Provider)"]:::cloudStyle
+        end
+
+        subgraph DatabaseTier["Firebase Realtime Database (RTDB)"]
+            direction TB
+            NodeUsers["/users\n(Administrator Credentials & Accounts)"]:::dbStyle
+            NodeCustomers["/customers\n(Customer Profiles & Google Accounts)"]:::dbStyle
+            NodeProducts["/products\n(Donut & Coffee Product Catalog)"]:::dbStyle
+            NodeOrders["/orders\n(Incoming Customer Orders Queue)"]:::dbStyle
+            NodeTransactions["/transactions\n(Sales History & Lifecycle Stages)"]:::dbStyle
+            NodeCarts["/carts/{username}\n(Isolated Customer Shopping Carts)"]:::dbStyle
+        end
+    end
+
+    CustomerUser -->|"Orders donuts & coffee via"| MobileUI
+    AdminUser -->|"Manages store inventory via"| WebUI
+
+    MobileLogic -->|"HTTP REST API (CRUD)"| DatabaseTier
+    MobileLogic -->|"Native Google Sign-In"| GoogleOAuth
+    MobileLogic -->|"Account Verification"| EmailAuth
+
+    WebLogic -->|"Fetch API over HTTPS (CRUD)"| DatabaseTier
+    WebLogic -->|"Admin Login Verification"| NodeUsers
+        </pre>
+      </div>
+
+      <div class="explanation-grid">
+        <div class="explanation-block">
+          <h4>Purpose & Overview</h4>
+          <p>
+            Provides a high-level view of the entire Daily Dough system. It illustrates the role separation between mobile customer shopping and web-based store management, connected through shared cloud services.
+          </p>
+        </div>
+        <div class="explanation-block">
+          <h4>Key Components</h4>
+          <ul>
+            <li><strong>Customer Mobile App:</strong> Native Android client built with Flutter.</li>
+            <li><strong>Web Admin Dashboard:</strong> Desktop management SPA for store admins.</li>
+            <li><strong>Cloud Backend (dailydough-5480d):</strong> Firebase Authentication & Realtime Database.</li>
+            <li><strong>Database Nodes:</strong> Structured JSON endpoints for users, products, orders, and carts.</li>
+          </ul>
+        </div>
+        <div class="explanation-block">
+          <h4>Data Flow</h4>
+          <p>
+            Customer requests flow from the Flutter app to the cloud database. The web admin dashboard queries the same endpoints to process orders and update menu availability.
+          </p>
+        </div>
+        <div class="explanation-block">
+          <h4>HOA01 Curriculum Connection</h4>
+          <p>
+            Fulfills <strong>HOA01 Objective 1</strong> (Understanding M-Commerce structure) and matches the 3 major components described on <strong>Page 3</strong> of the ITE 7 module.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. DIAGRAM B: MOBILE APPLICATION ARCHITECTURE -->
+    <section class="diagram-section" id="diagram-b">
+      <div class="diagram-header">
+        <h2>Diagram B: Mobile Application Architecture</h2>
+        <span class="diagram-badge">Flutter Client Breakdown</span>
+      </div>
+
+      <div class="diagram-wrapper">
+        <pre class="mermaid">
+flowchart TD
+    classDef screenStyle fill:#FFFBEB,stroke:#D97706,stroke-width:2px,color:#78350F;
+    classDef serviceStyle fill:#FEF3C7,stroke:#B45309,stroke-width:2px,color:#78350F;
+    classDef modelStyle fill:#ECFDF5,stroke:#059669,stroke-width:2px,color:#064E3B;
+    classDef networkStyle fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#1E3A8A;
+    classDef cloudStyle fill:#FFF7ED,stroke:#EA580C,stroke-width:2px,color:#7C2D12;
+
+    subgraph PresentationLayer["Presentation Layer (lib/screens/ & Widgets)"]
+        direction TB
+        LoginScreen["LoginScreen\n(Email/Password & Google Sign-In)"]:::screenStyle
+        RegisterScreen["RegisterScreen\n(Customer Self-Registration)"]:::screenStyle
+        ProductsScreen["ProductsScreen\n(Donut & Coffee Showcase with Tabs)"]:::screenStyle
+        DetailScreen["ProductDetailScreen\n(Item Details, Notes & Add to Cart)"]:::screenStyle
+        CartScreen["CartScreen\n(Quantity Increment, Remove & Total)"]:::screenStyle
+        CheckoutScreen["CheckoutScreen\n(Delivery Address, COD, GCash, Card)"]:::screenStyle
+        TrackingScreen["OrderTrackingScreen\n(Live 3-Stage Progress: Pending -> Processing -> Delivered)"]:::screenStyle
+    end
+
+    subgraph StateLayer["Business Logic & State Management (lib/services/)"]
+        FirebaseService["FirebaseService\n(ChangeNotifier State Manager)"]:::serviceStyle
+        MemCache["In-Memory Cache\n(cachedProducts, cachedCart, cachedTransactions)"]:::serviceStyle
+        FirebaseService <--> MemCache
+    end
+
+    subgraph DomainModels["Domain Models Layer (lib/models/)"]
+        ProductModel["Product Model\n(id, name, price, details, imageUrl)"]:::modelStyle
+        CartItemModel["CartItem Model\n(id, name, price, quantity, imageUrl)"]:::modelStyle
+        TransactionModel["TransactionRecord Model\n(id, username, items, total, stage, date)"]:::modelStyle
+    end
+
+    subgraph NativePlugins["Platform Integration Layer (Native Android Plugins)"]
+        HttpPackage["Dart http Package\n(REST API Client)"]:::networkStyle
+        GoogleSignInPackage["google_sign_in Plugin\n(Google Play Services OAuth)"]:::networkStyle
+        FirebaseCorePackage["firebase_core & firebase_auth\n(Native SDK Bridge)"]:::networkStyle
+    end
+
+    subgraph FirebaseCloud["Google Cloud Backend (dailydough-5480d)"]
+        RTDB["Realtime Database\n(dailydough-5480d-default-rtdb)"]:::cloudStyle
+        GoogleOAuthBackend["Google Identity Platform"]:::cloudStyle
+    end
+
+    LoginScreen --> FirebaseService
+    RegisterScreen --> FirebaseService
+    ProductsScreen --> FirebaseService
+    DetailScreen --> FirebaseService
+    CartScreen --> FirebaseService
+    CheckoutScreen --> FirebaseService
+    TrackingScreen --> FirebaseService
+
+    FirebaseService --> ProductModel
+    FirebaseService --> CartItemModel
+    FirebaseService --> TransactionModel
+
+    FirebaseService --> HttpPackage
+    FirebaseService --> GoogleSignInPackage
+    FirebaseService --> FirebaseCorePackage
+
+    HttpPackage -->|"HTTPS REST Requests"| RTDB
+    GoogleSignInPackage -->|"Native Android Handshake"| GoogleOAuthBackend
+    FirebaseCorePackage -->|"Auth Credential Sync"| GoogleOAuthBackend
+        </pre>
+      </div>
+
+      <div class="explanation-grid">
+        <div class="explanation-block">
+          <h4>Purpose & Overview</h4>
+          <p>
+            Illustrates the internal software architecture of the mobile shopping application, following clean Model-View-Service separation.
+          </p>
+        </div>
+        <div class="explanation-block">
+          <h4>Key Components</h4>
+          <ul>
+            <li><strong>Screens (`lib/screens/`):</strong> 7 user-facing views handling the complete customer purchase lifecycle.</li>
+            <li><strong>`FirebaseService`:</strong> Central ChangeNotifier state manager with in-memory caching.</li>
+            <li><strong>Domain Models:</strong> Strongly-typed Dart classes for items, carts, and orders.</li>
+            <li><strong>Plugins:</strong> Platform channels linking native Android code to Dart.</li>
+          </ul>
+        </div>
+        <div class="explanation-block">
+          <h4>Data Flow</h4>
+          <p>
+            User gestures on screens invoke methods on `FirebaseService`. The service updates local cache, synchronizes with Firebase via HTTP REST, and triggers reactive UI updates.
+          </p>
+        </div>
+        <div class="explanation-block">
+          <h4>HOA01 Curriculum Connection</h4>
+          <p>
+            Directly implements <strong>HOA01 Activity 4 (Step 7: Create Folder Structure)</strong>, organizing the codebase into `models`, `screens`, and `services`.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. DIAGRAM C: WEB ADMIN ARCHITECTURE -->
+    <section class="diagram-section" id="diagram-c">
+      <div class="diagram-header">
+        <h2>Diagram C: Web Admin Dashboard Architecture</h2>
+        <span class="diagram-badge">Managerial Single-Page App</span>
+      </div>
+
+      <div class="diagram-wrapper">
+        <pre class="mermaid">
+flowchart TD
+    classDef headerStyle fill:#EFEBE9,stroke:#3E2723,stroke-width:2px,color:#1B0000;
+    classDef viewStyle fill:#F5F5F5,stroke:#4E342E,stroke-width:2px,color:#271C19;
+    classDef modalStyle fill:#FFF8E1,stroke:#FFA000,stroke-width:2px,color:#FF6F00;
+    classDef controllerStyle fill:#E0F2FE,stroke:#0284C7,stroke-width:2px,color:#0C4A6E;
+    classDef dbStyle fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#1E3A8A;
+
+    subgraph BrowserApp["Daily Dough Web Admin Dashboard (web_dashboard/)"]
+        subgraph AdminAuthView["Admin Access Portal (admin.html)"]
+            LoginForm["Admin Login View\n(Username / Password Form Only)"]:::headerStyle
+        end
+
+        subgraph AdminWorkspaceView["Store Administrator Workspace"]
+            subgraph NavigationChrome["Navigation Chrome"]
+                Sidebar["Sidebar Navigation Menu\n(Dashboard, Orders, Products, Customers, Payments)"]:::headerStyle
+                TopHeader["Top Header Bar\n(Global Search & Notification Bell Dropdown)"]:::headerStyle
+            end
+
+            subgraph ContentModules["Management Content Modules"]
+                ViewDashboard["Dashboard View\n(KPI Cards: Revenue, Orders, Customers, Pending Alert)"]:::viewStyle
+                ViewOrders["Orders Management\n(Orders Table, Status Filters: All, Pending, Processing, Delivered)"]:::viewStyle
+                ViewProducts["Products Catalog\n(Product Grid, Photo Display, Price, Category Tabs)"]:::viewStyle
+                ViewCustomers["Customers Directory\n(Registered Customer Accounts & Google Profiles)"]:::viewStyle
+                ViewPayments["Payments & Sales\n(Payment Channel Breakdown: COD, GCash, Card)"]:::viewStyle
+            end
+
+            subgraph ActionModals["Interactive Action Modals"]
+                AddModal["Add Product Modal Form\n(Name, Price, Asset URL, Description)"]:::modalStyle
+                EditModal["Edit Product Modal Form\n(Real-Time Catalog Updating)"]:::modalStyle
+                NotifDropdown["Notification Dropdown Panel\n(Recent Orders Preview & Direct Navigation)"]:::modalStyle
+            end
+        end
+
+        subgraph ApplicationController["Application Controller & State (app.js)"]
+            AppState["Application State Store\n(state.isLoggedIn, state.products, state.transactions)"]:::controllerStyle
+            Router["Single-Page Router\n(switchView, showLogin, showWorkspace)"]:::controllerStyle
+            RestEngine["Firebase REST Engine\n(fetch, POST, PATCH, DELETE handlers)"]:::controllerStyle
+            SearchEngine["Global Search & Filtering Engine"]:::controllerStyle
+            NotifEngine["Notification Polling & Badge Counter"]:::controllerStyle
+        end
+    end
+
+    subgraph CloudDatabase["Firebase Realtime Database (dailydough-5480d)"]
+        DB_Users["/users.json\n(Admin Credentials Check)"]:::dbStyle
+        DB_Products["/products.json\n(CRUD Operations)"]:::dbStyle
+        DB_Orders["/orders.json\n(Live Customer Orders)"]:::dbStyle
+        DB_Transactions["/transactions.json\n(Lifecycle Status Updates)"]:::dbStyle
+        DB_Customers["/customers.json\n(Customer Monitoring)"]:::dbStyle
+    end
+
+    LoginForm -->|"handleLogin(admin, admin123)"| AppState
+    AppState -->|"Authenticated"| Router
+    Router --> NavigationChrome
+    Router --> ContentModules
+
+    TopHeader --> NotifDropdown
+    ViewProducts --> AddModal
+    ViewProducts --> EditModal
+
+    NavigationChrome --> Router
+    ContentModules --> AppState
+
+    AppState --- RestEngine
+    AppState --- SearchEngine
+    AppState --- NotifEngine
+
+    RestEngine -->|"GET (Verify Admin)"| DB_Users
+    RestEngine -->|"GET / POST / PATCH / DELETE"| DB_Products
+    RestEngine -->|"GET / PATCH (Update Status)"| DB_Transactions
+    RestEngine -->|"GET (Customer Directory)"| DB_Customers
+        </pre>
+      </div>
+
+      <div class="explanation-grid">
+        <div class="explanation-block">
+          <h4>Purpose & Overview</h4>
+          <p>
+            Outlines the architecture of the Web Admin Dashboard, detailing how store staff manage inventory, review sales KPIs, and update customer order statuses.
+          </p>
+        </div>
+        <div class="explanation-block">
+          <h4>Key Components</h4>
+          <ul>
+            <li><strong>Admin Login:</strong> Dedicated username/password portal protecting store data.</li>
+            <li><strong>KPI Dashboard:</strong> Live counters for sales, volume, customers, and pending alerts.</li>
+            <li><strong>Catalog CRUD:</strong> Add, edit, and delete donut/coffee listings in cloud database.</li>
+            <li><strong>Orders Pipeline:</strong> Interactive status workflow (Pending &rarr; Processing &rarr; Delivered).</li>
+          </ul>
+        </div>
+        <div class="explanation-block">
+          <h4>Data Flow</h4>
+          <p>
+            The single-page controller (`app.js`) handles client routing, manages session tokens, and executes REST calls directly against the cloud JSON database.
+          </p>
+        </div>
+        <div class="explanation-block">
+          <h4>HOA01 Curriculum Connection</h4>
+          <p>
+            Fulfills the administrative monitoring and management requirements specified in <strong>HOA01 Overview (Module Page 3)</strong> and <strong>HOA04 (Web-Based Admin Dashboard)</strong>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. DIAGRAM D: SYSTEM COMMUNICATION FLOW -->
+    <section class="diagram-section" id="diagram-d">
+      <div class="diagram-header">
+        <h2>Diagram D: System Communication & Data Flow</h2>
+        <span class="diagram-badge">End-to-End Order Lifecycle</span>
+      </div>
+
+      <div class="diagram-wrapper">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Customer as Customer (Mobile App)
+    participant Mobile as Flutter App (FirebaseService)
+    participant Cloud as Firebase Realtime Database
+    participant AdminApp as Web Admin (app.js)
+    actor Admin as Store Administrator
+
+    Note over Customer,Admin: Step 1: Customer Browsing & Ordering
+    Customer->>Mobile: Opens Mobile App, browses donuts and coffees
+    Mobile->>Cloud: GET /products.json
+    Cloud-->>Mobile: Returns live product menu array
+    Customer->>Mobile: Adds Pistachio & Hot Cafe Latte to Cart
+    Customer->>Mobile: Enters Delivery Address, selects Payment (GCash)
+    Customer->>Mobile: Taps "Confirm Order"
+    Mobile->>Cloud: POST /orders.json & POST /transactions.json (stage: "Pending")
+    Cloud-->>Mobile: HTTP 200 OK (Order ID Created)
+    Mobile->>Customer: Order placed! Navigates to Live Order Tracking Screen
+
+    Note over Cloud,Admin: Step 2: Administrator Real-Time Notification & Processing
+    AdminApp->>Cloud: Periodic Polling (GET /transactions.json)
+    Cloud-->>AdminApp: Returns updated transactions list with new Pending order
+    AdminApp->>AdminApp: Increments Notification Bell Badge (🔔 1) & Updates KPI Cards
+    Admin->>AdminApp: Clicks Notification Bell & views order details
+    Admin->>AdminApp: Changes Order Status from "Pending" to "Processing"
+    AdminApp->>Cloud: PATCH /transactions/{id}.json {"stage": "Processing"}
+    Cloud-->>AdminApp: HTTP 200 OK (Updated in Cloud)
+
+    Note over Customer,Mobile: Step 3: Customer Live Status Synchronization
+    Mobile->>Cloud: Polls / Streams Customer Orders (GET /transactions.json)
+    Cloud-->>Mobile: Returns Order with updated stage ("Processing")
+    Mobile->>Customer: Tracking Screen updates: Stage 2 "Baking & Preparing" Active!
+
+    Note over Cloud,Admin: Step 4: Order Delivery Completion
+    Admin->>AdminApp: Updates Order Status to "Delivered"
+    AdminApp->>Cloud: PATCH /transactions/{id}.json {"stage": "Delivered"}
+    Cloud-->>AdminApp: HTTP 200 OK
+    Mobile->>Cloud: GET /transactions.json
+    Cloud-->>Mobile: Returns Order with stage "Delivered"
+    Mobile->>Customer: Tracking Screen shows "Order Delivered! Enjoy your treats."
+        </pre>
+      </div>
+
+      <div class="explanation-grid">
+        <div class="explanation-block">
+          <h4>Purpose & Overview</h4>
+          <p>
+            Demonstrates the end-to-end communication sequence of an order from customer submission to final delivery.
+          </p>
+        </div>
+        <div class="explanation-block">
+          <h4>Key Steps</h4>
+          <ul>
+            <li><strong>1. Placing Order:</strong> Mobile app writes order details to `/orders` and `/transactions`.</li>
+            <li><strong>2. Admin Notification:</strong> Dashboard detects new order, triggers bell badge and audio alert.</li>
+            <li><strong>3. Kitchen Processing:</strong> Admin updates status to *Processing*, advancing customer tracking UI.</li>
+            <li><strong>4. Completion:</strong> Admin marks order as *Delivered*, completing the transaction.</li>
+          </ul>
+        </div>
+        <div class="explanation-block">
+          <h4>Data Flow</h4>
+          <p>
+            All state transitions occur asynchronously via cloud REST endpoints. No direct mobile-to-web connection is needed.
+          </p>
+        </div>
+        <div class="explanation-block">
+          <h4>HOA01 Curriculum Connection</h4>
+          <p>
+            Demonstrates **Real-Time Order Synchronization** as defined in **HOA01 Outcomes (Page 8)** and **HOA05 (System Integration)**.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. DIAGRAM E: TECHNOLOGY STACK -->
+    <section class="diagram-section" id="diagram-e">
+      <div class="diagram-header">
+        <h2>Diagram E: Technology Stack</h2>
+        <span class="diagram-badge">Engineering Classification</span>
+      </div>
+
+      <div class="diagram-wrapper">
+        <pre class="mermaid">
+flowchart TD
+    classDef mobileTier fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#78350F;
+    classDef webTier fill:#EFEBE9,stroke:#4E342E,stroke-width:2px,color:#271C19;
+    classDef cloudTier fill:#FFFBEB,stroke:#F59E0B,stroke-width:2px,color:#78350F;
+    classDef toolsTier fill:#F1F5F9,stroke:#475569,stroke-width:2px,color:#0F172A;
+
+    subgraph TechStack["Daily Dough M-Commerce Technology Stack (HOA01)"]
+        subgraph MobileDev["Mobile Development Tier (Customer Client)"]
+            Flutter["Flutter SDK (v3.47.7 - UI Toolkit)"]:::mobileTier
+            Dart["Dart Language (v3.13.5 - Sound Null Safety)"]:::mobileTier
+            Material3["Material Design 3 (Adaptive Widgets & Theming)"]:::mobileTier
+            HttpPkg["http Package (REST API Communication)"]:::mobileTier
+            GoogleSignInPkg["google_sign_in Plugin (Native OAuth)"]:::mobileTier
+            FirebasePackages["firebase_core & firebase_auth (SDK Bridge)"]:::mobileTier
+        end
+
+        subgraph WebDev["Web Development Tier (Store Administrator Portal)"]
+            HTML5["HTML5 (Semantic Layout & Dynamic Modals)"]:::webTier
+            CSS3["CSS3 (Flexbox, Grid, Responsive Design & Branding)"]:::webTier
+            VanillaJS["Modern JavaScript ES6+ (Async/Await, REST Fetch Engine)"]:::webTier
+            BrandFonts["Artisan Typography (Outfit, Inter, Dancing Script)"]:::webTier
+        end
+
+        subgraph CloudBaaS["Cloud Backend & Services Tier (BaaS)"]
+            FirebaseBaaS["Google Firebase Platform (Project: dailydough-5480d)"]:::cloudTier
+            RTDBCloud["Firebase Realtime Database (Cloud JSON NoSQL)"]:::cloudTier
+            FirebaseAuthCloud["Firebase Authentication (RBAC Access Protection)"]:::cloudTier
+            GoogleCloudOAuthCloud["Google Cloud Identity Platform (OAuth 2.0 Client)"]:::cloudTier
+        end
+
+        subgraph DevEnvironment["Development, Build & Deployment Tools"]
+            AndroidStudioIDE["Android Studio (SDK 36, JBR, Device Manager)"]:::toolsTier
+            VSCodeIDE["Visual Studio Code (Dart & Flutter Extensions)"]:::toolsTier
+            GitVCS["Git (Local Version Control)"]:::toolsTier
+            KeytoolUtil["Java keytool (Debug SHA-1 & SHA-256 Fingerprinting)"]:::toolsTier
+            PowerShellServer["PowerShell & Local HTTP Daemon (Port 5050)"]:::toolsTier
+        end
+    end
+
+    MobileDev -->|"HTTPS REST Calls & Auth Tokens"| CloudBaaS
+    WebDev -->|"Fetch API over HTTPS"| CloudBaaS
+    DevEnvironment -->|"Builds, Compiles & Tests"| MobileDev
+    DevEnvironment -->|"Serves & Manages"| WebDev
+        </pre>
+      </div>
+
+      <div class="explanation-grid">
+        <div class="explanation-block">
+          <h4>Purpose & Overview</h4>
+          <p>
+            Categorizes every programming language, runtime, cloud service, and developer utility used to build, test, and run Daily Dough.
+          </p>
+        </div>
+        <div class="explanation-block">
+          <h4>Tier Categorization</h4>
+          <ul>
+            <li><strong>Mobile Tier:</strong> Flutter SDK, Dart, Material 3, Google Play Services.</li>
+            <li><strong>Web Tier:</strong> HTML5, CSS3, ES6+ JavaScript, custom artisan fonts.</li>
+            <li><strong>Cloud Tier:</strong> Google Firebase BaaS, Realtime Database, Firebase Auth.</li>
+            <li><strong>Tooling:</strong> Android Studio, Gradle Kotlin DSL, PowerShell, keytool.</li>
+          </ul>
+        </div>
+        <div class="explanation-block">
+          <h4>Integration</h4>
+          <p>
+            Standardized HTTPS REST APIs and Google Play Services platform channels bridge frontend clients to cloud services.
+          </p>
+        </div>
+        <div class="explanation-block">
+          <h4>HOA01 Curriculum Connection</h4>
+          <p>
+            Fulfills <strong>HOA01 Activity 1 (Installing Required Software)</strong> and <strong>Activity 5 (Connecting Firebase)</strong>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</body>
+</html>

@@ -3,6 +3,26 @@
 
 const FIREBASE_BASE_URL = 'https://dailydough-5480d-default-rtdb.firebaseio.com';
 
+// Firebase Web Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDgI-ooofZ6WEf-XQB9OAIZbj9FFdzipEk",
+  authDomain: "dailydough-5480d.firebaseapp.com",
+  databaseURL: FIREBASE_BASE_URL,
+  projectId: "dailydough-5480d",
+  storageBucket: "dailydough-5480d.firebasestorage.app",
+  messagingSenderId: "662178737628",
+  appId: "1:662178737628:web:7c407654bf8e78deaf3319"
+};
+
+// Initialize Firebase App for Authentication if SDK is loaded
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+  try {
+    firebase.initializeApp(firebaseConfig);
+  } catch (err) {
+    console.warn('Firebase Auth initialization standby:', err);
+  }
+}
+
 // App State
 const state = {
   isLoggedIn: false,
@@ -19,6 +39,16 @@ const state = {
 // Initialize Application on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
   checkFirebaseConnection();
+
+  // Restore remembered username if enabled
+  const remembered = localStorage.getItem('dailyDoughRememberUsername');
+  const userField = document.getElementById('usernameInput');
+  const rememberCb = document.getElementById('rememberMeCheckbox');
+  if (remembered && userField) {
+    userField.value = remembered;
+    if (rememberCb) rememberCb.checked = true;
+  }
+
   // Check if admin was previously logged in session (optional convenience)
   const savedAdmin = sessionStorage.getItem('dailyDoughAdminAuth');
   if (savedAdmin === 'true') {
@@ -27,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showWorkspace();
     refreshAllData();
   } else {
+    // Show login view by default on admin portal
     showLogin();
   }
 });
@@ -35,44 +66,68 @@ document.addEventListener('DOMContentLoaded', () => {
 // 1. Firebase Connectivity Check
 // ==========================================
 async function checkFirebaseConnection() {
-  const badge = document.getElementById('firebaseBadge');
-  const dot = badge ? badge.querySelector('.status-dot') : null;
-  const text = document.getElementById('firebaseStatusText');
-
   try {
     const res = await fetch(`${FIREBASE_BASE_URL}/.json?shallow=true`, { method: 'GET' });
     if (res.ok) {
       state.firebaseConnected = true;
-      if (dot) dot.className = 'status-dot';
-      if (text) text.innerText = 'Firebase RTDB: Connected & Synchronized';
     } else if (res.status === 401 || (await res.text()).includes('Permission denied')) {
       state.firebaseConnected = true;
-      if (dot) dot.className = 'status-dot';
-      if (text) text.innerText = 'Firebase RTDB: Connected (Auth Active)';
     } else {
-      if (dot) dot.className = 'status-dot error';
-      if (text) text.innerText = `Firebase RTDB: HTTP ${res.status}`;
+      state.firebaseConnected = false;
     }
   } catch (err) {
-    if (dot) dot.className = 'status-dot syncing';
-    if (text) text.innerText = 'Firebase RTDB: Standby Mode';
+    state.firebaseConnected = false;
   }
 }
 
 // ==========================================
-// 2. Authentication & Session Management
+// 2. View Navigation & Session Management
 // ==========================================
+function showStorefront() {
+  window.location.href = 'index.html';
+}
+
 function showLogin() {
-  document.getElementById('viewLogin').style.display = 'flex';
-  document.getElementById('viewLogin').classList.add('active');
-  document.getElementById('adminWorkspace').style.display = 'none';
+  const login = document.getElementById('viewLogin');
+  const workspace = document.getElementById('adminWorkspace');
+  if (login) {
+    login.style.display = 'flex';
+    login.classList.add('active');
+  }
+  if (workspace) {
+    workspace.style.display = 'none';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function showWorkspace() {
-  document.getElementById('viewLogin').style.display = 'none';
-  document.getElementById('viewLogin').classList.remove('active');
-  document.getElementById('adminWorkspace').style.display = 'flex';
-  switchView('dashboard');
+  const login = document.getElementById('viewLogin');
+  const workspace = document.getElementById('adminWorkspace');
+  if (login) {
+    login.style.display = 'none';
+    login.classList.remove('active');
+  }
+  if (workspace) {
+    workspace.style.display = 'flex';
+  }
+  switchView(state.activeView || 'dashboard');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function filterStorefrontMenu(category, btn) {
+  const buttons = document.querySelectorAll('.menu-tab-btn');
+  buttons.forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const cards = document.querySelectorAll('.product-item-card');
+  cards.forEach(card => {
+    const cat = card.getAttribute('data-category');
+    if (category === 'all' || cat === category) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
 }
 
 async function handleLogin(e) {
@@ -109,7 +164,7 @@ async function handleLogin(e) {
       if (usersData && typeof usersData === 'object') {
         for (const key of Object.keys(usersData)) {
           const u = usersData[key];
-          if (u.username === 'admin' && u.password === passwordInput) {
+          if ((u.username === 'admin' || u.role === 'admin') && u.password === passwordInput) {
             authenticated = true;
             break;
           }
@@ -128,6 +183,14 @@ async function handleLogin(e) {
     state.currentUser = 'admin';
     sessionStorage.setItem('dailyDoughAdminAuth', 'true');
 
+    // Handle "Remember Me" checkbox preference
+    const rememberCb = document.getElementById('rememberMeCheckbox');
+    if (rememberCb && rememberCb.checked) {
+      localStorage.setItem('dailyDoughRememberUsername', usernameInput);
+    } else {
+      localStorage.removeItem('dailyDoughRememberUsername');
+    }
+
     alertToast('Welcome to Daily Dough Store Administrator Workspace!');
     showWorkspace();
     await refreshAllData();
@@ -138,7 +201,8 @@ async function handleLogin(e) {
 
 function showLoginError(msg) {
   const alertBox = document.getElementById('loginAlert');
-  alertBox.innerText = msg;
+  if (!alertBox) return;
+  alertBox.innerHTML = msg;
   alertBox.style.display = 'block';
 }
 
@@ -154,7 +218,14 @@ function handleLogout() {
   if (passInput) passInput.type = 'password';
   
   const toggleBtn = document.getElementById('togglePasswordBtn');
-  if (toggleBtn) toggleBtn.innerText = '👁️';
+  if (toggleBtn) {
+    const eyeOff = toggleBtn.querySelector('.eye-off');
+    const eyeOn = toggleBtn.querySelector('.eye-on');
+    if (eyeOff && eyeOn) {
+      eyeOff.style.display = 'block';
+      eyeOn.style.display = 'none';
+    }
+  }
 
   showLogin();
   alertToast('Logged out of Administrator Portal.');
@@ -166,11 +237,221 @@ function togglePasswordVisibility() {
   if (!passInput) return;
   if (passInput.type === 'password') {
     passInput.type = 'text';
-    if (btn) btn.innerText = '🙈';
+    if (btn) {
+      const eyeOff = btn.querySelector('.eye-off');
+      const eyeOn = btn.querySelector('.eye-on');
+      if (eyeOff && eyeOn) {
+        eyeOff.style.display = 'none';
+        eyeOn.style.display = 'block';
+      }
+    }
   } else {
     passInput.type = 'password';
-    if (btn) btn.innerText = '👁️';
+    if (btn) {
+      const eyeOff = btn.querySelector('.eye-off');
+      const eyeOn = btn.querySelector('.eye-on');
+      if (eyeOff && eyeOn) {
+        eyeOff.style.display = 'block';
+        eyeOn.style.display = 'none';
+      }
+    }
   }
+}
+
+let isGoogleAuthenticating = false;
+
+async function handleGoogleSignIn() {
+  if (isGoogleAuthenticating) return;
+
+  const alertBox = document.getElementById('loginAlert');
+  if (alertBox) alertBox.style.display = 'none';
+
+  // 1. Environment Protocol Check:
+  // Firebase Auth (OAuth popups) strictly requires http: or https:
+  // Browsers block OAuth storage and popups on file:/// URLs.
+  if (window.location.protocol === 'file:') {
+    const localUrl = 'http://localhost:5050/admin.html';
+    showLoginError(
+      `<strong>Local Server Required for Google Sign-In:</strong><br>` +
+      `Google OAuth cannot authenticate on <code>file://</code> URLs due to browser security restrictions.<br><br>` +
+      `<a href="${localUrl}" style="display: inline-block; background: #D97706; color: #ffffff; padding: 10px 18px; border-radius: 9999px; text-decoration: none; font-weight: bold; margin-top: 4px;">` +
+      `Switch to http://localhost:5050 &rarr;` +
+      `</a><br><br><small style="color: #64748B;">Redirecting automatically to your local server...</small>`
+    );
+    setTimeout(() => {
+      window.location.href = localUrl;
+    }, 1800);
+    return;
+  }
+
+  // 2. Verify Firebase SDK availability
+  if (typeof firebase === 'undefined' || !firebase.auth) {
+    showLoginError('Firebase Authentication SDK is not loaded. Please verify internet connection.');
+    return;
+  }
+
+  // 2. Verify / prompt for Firebase Web API Key if placeholder is detected
+  if (firebaseConfig.apiKey === "AIzaSyDummyKeyReplaceWithActual" || !firebaseConfig.apiKey) {
+    const enteredKey = prompt(
+      "Firebase Web API Key Required:\n\nPlease enter your Firebase Web API Key from Firebase Console (Project Settings -> General -> Your apps -> Web app config):",
+      localStorage.getItem('dailyDoughFirebaseApiKey') || ""
+    );
+    if (!enteredKey || !enteredKey.trim()) {
+      showLoginError('Google Sign-In requires a valid Firebase Web API Key. Please provide it to proceed.');
+      return;
+    }
+    firebaseConfig.apiKey = enteredKey.trim();
+    localStorage.setItem('dailyDoughFirebaseApiKey', enteredKey.trim());
+
+    // Re-initialize Firebase with updated config
+    try {
+      if (firebase.apps && firebase.apps.length) {
+        await Promise.all(firebase.apps.map(a => a.delete()));
+      }
+      firebase.initializeApp(firebaseConfig);
+    } catch (reinitErr) {
+      console.warn('Firebase reinitialization notice:', reinitErr);
+    }
+  }
+
+  const googleBtn = document.getElementById('btnGoogleSignIn');
+  const originalBtnHtml = googleBtn ? googleBtn.innerHTML : '';
+
+  try {
+    isGoogleAuthenticating = true;
+    if (googleBtn) {
+      googleBtn.disabled = true;
+      googleBtn.style.opacity = '0.7';
+      googleBtn.innerHTML = '<span>Connecting to Google...</span>';
+    }
+
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    // Authenticate through Firebase Auth
+    const result = await firebase.auth().signInWithPopup(provider);
+    const user = result.user;
+    if (!user) {
+      throw new Error('Authentication completed but no user profile returned.');
+    }
+
+    const userEmail = (user.email || '').toLowerCase().trim();
+    const displayName = user.displayName || 'Store Administrator';
+
+    // 3. Strict Admin Access Protection (Part 2 & 5)
+    // Mobile customers must not be granted admin workspace access
+    let isAuthorizedAdmin = false;
+    let verifiedAdminName = displayName;
+
+    // Check Firebase RTDB /users node
+    try {
+      const res = await fetch(`${FIREBASE_BASE_URL}/users.json`);
+      if (res.ok) {
+        const usersData = await res.json();
+        if (usersData && typeof usersData === 'object') {
+          for (const key of Object.keys(usersData)) {
+            const u = usersData[key];
+            if (u && typeof u === 'object') {
+              const uEmail = (u.email || '').toLowerCase().trim();
+              const uUsername = (u.username || '').toLowerCase().trim();
+              const uRole = (u.role || '').toLowerCase().trim();
+
+              // Explicit admin account matching
+              if ((uEmail && uEmail === userEmail && (uRole === 'admin' || uUsername === 'admin')) ||
+                  (uUsername === 'admin' && (uEmail === userEmail || userEmail.startsWith('admin@')))) {
+                isAuthorizedAdmin = true;
+                if (u.fullName) verifiedAdminName = u.fullName;
+                break;
+              }
+            }
+          }
+        }
+      }
+    } catch (fetchErr) {
+      console.warn('Database verification notice:', fetchErr);
+    }
+
+    // Default system admin email check
+    if (userEmail === 'admin@dailydough.com' || userEmail === 'admin@gmail.com') {
+      isAuthorizedAdmin = true;
+    }
+
+    // Check optional local admin whitelist
+    try {
+      const whitelist = JSON.parse(localStorage.getItem('dailyDoughAdminWhitelist') || '[]');
+      if (Array.isArray(whitelist) && whitelist.includes(userEmail)) {
+        isAuthorizedAdmin = true;
+      }
+    } catch (_) {}
+
+    // If account is not authorized as admin
+    if (!isAuthorizedAdmin) {
+      await firebase.auth().signOut();
+      showLoginError(
+        `Access Denied: The Google account (${userEmail}) is not registered as a Daily Dough Store Administrator. Mobile customers must use the Daily Dough Mobile App.`
+      );
+      return;
+    }
+
+    // 4. Successful Admin Authentication
+    state.isLoggedIn = true;
+    state.currentUser = verifiedAdminName;
+    sessionStorage.setItem('dailyDoughAdminAuth', 'true');
+    sessionStorage.setItem('dailyDoughAdminEmail', userEmail);
+
+    // Update sidebar admin profile if elements exist
+    const adminNameEl = document.querySelector('.admin-info .name');
+    const adminRoleEl = document.querySelector('.admin-info .role');
+    if (adminNameEl) adminNameEl.textContent = verifiedAdminName;
+    if (adminRoleEl) adminRoleEl.textContent = userEmail;
+
+    alertToast(`Welcome, ${verifiedAdminName}! Authenticated via Google.`);
+    showWorkspace();
+    await refreshAllData();
+
+  } catch (error) {
+    console.error('Google Sign-In Error:', error);
+    let msg = 'Google authentication encountered an issue. Please try again.';
+    if (error.code === 'auth/popup-closed-by-user') {
+      msg = 'Sign-in cancelled. The Google sign-in window was closed.';
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      msg = 'Only one Google sign-in request can be processed at a time.';
+    } else if (error.code === 'auth/popup-blocked') {
+      msg = 'Pop-up was blocked by your browser. Please allow pop-ups for this page to sign in with Google.';
+    } else if (error.code === 'auth/network-request-failed') {
+      msg = 'Network connection unavailable. Please check your internet connection.';
+    } else if (error.code === 'auth/operation-not-allowed' || error.code === 'auth/configuration-not-found') {
+      msg = `<strong>Google Sign-In is not enabled yet in your Firebase Console:</strong><br><br>` +
+            `To enable it:<br>` +
+            `1. Open <a href="https://console.firebase.google.com/project/dailydough-5480d/authentication/providers" target="_blank" style="color: #2563EB; font-weight: bold; text-decoration: underline;">Firebase Console &rarr; Authentication</a><br>` +
+            `2. Click <b>"Get Started"</b> (if first time).<br>` +
+            `3. In the <b>Sign-in method</b> tab, click <b>Google</b>.<br>` +
+            `4. Toggle <b>Enable</b>, select your email under <i>Project support email</i>, and click <b>Save</b>.`;
+    } else if (error.code === 'auth/unauthorized-domain') {
+      msg = 'This domain is not authorized in Firebase. Please add your host domain (e.g. localhost or 127.0.0.1) to Authorized Domains in Firebase Console.';
+    } else if (error.code === 'auth/operation-not-supported-in-this-environment') {
+      msg = 'Google Sign-In is not supported on file:// URLs. Please access the dashboard via your local server: <a href="http://localhost:5050/admin.html" style="color: #2563EB; font-weight: bold; text-decoration: underline;">http://localhost:5050/admin.html</a>';
+    } else if (error.message) {
+      msg = error.message;
+    }
+    showLoginError(msg);
+  } finally {
+    isGoogleAuthenticating = false;
+    if (googleBtn) {
+      googleBtn.disabled = false;
+      googleBtn.style.opacity = '1';
+      googleBtn.innerHTML = originalBtnHtml;
+    }
+  }
+}
+
+function handleGoogleStandby() {
+  handleGoogleSignIn();
+}
+
+function handleSignUpNotice(e) {
+  if (e) e.preventDefault();
+  alertToast('Customer accounts are registered via the Daily Dough Mobile App. This portal is strictly for Store Administrators.');
 }
 
 // ==========================================
@@ -239,7 +520,7 @@ async function refreshAllData() {
     renderAdminProducts();
     renderAdminCustomers();
     renderAdminPayments();
-    alertToast('Store data synchronized with Firebase RTDB!');
+    alertToast('Store data refreshed successfully!');
   } catch (e) {
     console.error('Data refresh error:', e);
   }
@@ -267,15 +548,17 @@ async function refreshProducts(render = true) {
 
 async function refreshTransactions(render = true) {
   try {
-    const res = await fetch(`${FIREBASE_BASE_URL}/transactions.json`);
-    if (res.ok) {
-      const data = await res.json();
+    let res = await fetch(`${FIREBASE_BASE_URL}/orders.json`);
+    let data = res.ok ? await res.json() : null;
+    if (!data || Object.keys(data).length === 0) {
+      res = await fetch(`${FIREBASE_BASE_URL}/transactions.json`);
+      data = res.ok ? await res.json() : null;
+    }
+    if (data && typeof data === 'object') {
       const list = [];
-      if (data && typeof data === 'object') {
-        Object.keys(data).forEach(k => {
-          list.push({ id: k, ...data[k] });
-        });
-      }
+      Object.keys(data).forEach(k => {
+        list.push({ id: k, ...data[k] });
+      });
       // Sort newest first
       list.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
       state.transactions = list;
@@ -357,6 +640,17 @@ function updateKPIs() {
     headerPendingBadge.innerText = pendingOrders;
     headerPendingBadge.style.display = pendingOrders > 0 ? 'inline-block' : 'none';
   }
+
+  const notifCounter = document.getElementById('notifPanelCounter');
+  if (notifCounter) {
+    notifCounter.innerText = `${pendingOrders} Pending`;
+  }
+
+  // If notification panel is open, keep it in sync
+  const notifPanel = document.getElementById('notificationDropdownPanel');
+  if (notifPanel && notifPanel.style.display !== 'none') {
+    renderNotificationDropdown();
+  }
 }
 
 // ==========================================
@@ -376,7 +670,7 @@ function renderSalesTrendChart() {
   if (state.transactions.length === 0) {
     container.innerHTML = `
       <div style="display: flex; height: 100%; align-items: center; justify-content: center; color: var(--text-muted); font-size: 13px;">
-        No transaction records available in Firebase RTDB.
+        No transaction records found yet.
       </div>`;
     return;
   }
@@ -678,7 +972,7 @@ function renderAdminProducts() {
   let list = filterByQuery(state.products, state.searchQuery);
 
   if (list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">No products found matching criteria. Use form above to add products.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No products found matching criteria. Use form above to add products.</td></tr>`;
     return;
   }
 
@@ -687,15 +981,17 @@ function renderAdminProducts() {
     const imgHtml = p.imageUrl
       ? `<img src="${escapeHtml(p.imageUrl)}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);" onerror="this.outerHTML='<span style=\\'font-size: 26px;\\'>🍩</span>'">`
       : `<span style="font-size: 26px;">🍩</span>`;
+    const stockVal = p.stock !== undefined ? p.stock : 50;
 
     tr.innerHTML = `
       <td>${imgHtml}</td>
-      <td><strong>${escapeHtml(p.name)}</strong></td>
+      <td><strong>${escapeHtml(p.productName || p.name)}</strong></td>
       <td><strong style="color: #b45309;">₱${Number(p.price || 0).toLocaleString()}</strong></td>
-      <td style="color: #64748b; font-size: 13px;">${escapeHtml(p.details || '-')}</td>
+      <td><span class="badge" style="background: #fef3c7; color: #92400e; font-weight: 600;">${stockVal} pcs</span></td>
+      <td style="color: #64748b; font-size: 13px;">${escapeHtml(p.description || p.details || '-')}</td>
       <td style="text-align: right;">
         <button class="btn btn-outline btn-sm" onclick="showEditProductModal('${p.id}')">✏️ Edit</button>
-        <button class="btn btn-danger btn-sm" style="margin-left: 6px;" onclick="handleAdminDeleteProduct('${p.id}', '${escapeHtml(p.name)}')">🗑️ Delete</button>
+        <button class="btn btn-danger btn-sm" style="margin-left: 6px;" onclick="handleAdminDeleteProduct('${p.id}', '${escapeHtml(p.productName || p.name)}')">🗑️ Delete</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -706,6 +1002,8 @@ async function handleAdminAddProduct(e) {
   e.preventDefault();
   const name = document.getElementById('adminNewName').value.trim();
   const price = parseFloat(document.getElementById('adminNewPrice').value);
+  const stockInput = document.getElementById('adminNewStock');
+  const stock = stockInput ? (parseInt(stockInput.value, 10) || 50) : 50;
   const imageUrl = document.getElementById('adminNewImageUrl').value.trim();
   const details = document.getElementById('adminNewDetails').value.trim();
 
@@ -718,7 +1016,15 @@ async function handleAdminAddProduct(e) {
     return;
   }
 
-  const newProd = { name, price, imageUrl, details };
+  const newProd = {
+    name,
+    productName: name,
+    price,
+    stock,
+    imageUrl,
+    details,
+    description: details
+  };
 
   try {
     const res = await fetch(`${FIREBASE_BASE_URL}/products.json`, {
@@ -738,8 +1044,10 @@ async function handleAdminAddProduct(e) {
 
   state.products.unshift(newProd);
   document.getElementById('adminAddProductForm').reset();
+  const defStock = document.getElementById('adminNewStock');
+  if (defStock) defStock.value = '50';
   renderAdminProducts();
-  alertToast(`Product "${name}" added to Firebase store catalog!`);
+  alertToast(`Product "${name}" added to store catalog!`);
 }
 
 function showEditProductModal(id) {
@@ -747,10 +1055,12 @@ function showEditProductModal(id) {
   if (!prod) return;
 
   document.getElementById('editProdId').value = prod.id;
-  document.getElementById('editProdName').value = prod.name;
+  document.getElementById('editProdName').value = prod.productName || prod.name;
   document.getElementById('editProdPrice').value = prod.price;
+  const stockEl = document.getElementById('editProdStock');
+  if (stockEl) stockEl.value = prod.stock !== undefined ? prod.stock : 50;
   document.getElementById('editProdImageUrl').value = prod.imageUrl || '';
-  document.getElementById('editProdDetails').value = prod.details || '';
+  document.getElementById('editProdDetails').value = prod.description || prod.details || '';
   document.getElementById('editProductModal').style.display = 'flex';
 }
 
@@ -763,6 +1073,8 @@ async function handleSaveEditProduct(e) {
   const id = document.getElementById('editProdId').value;
   const name = document.getElementById('editProdName').value.trim();
   const price = parseFloat(document.getElementById('editProdPrice').value);
+  const stockInput = document.getElementById('editProdStock');
+  const stock = stockInput ? (parseInt(stockInput.value, 10) || 50) : 50;
   const imageUrl = document.getElementById('editProdImageUrl').value.trim();
   const details = document.getElementById('editProdDetails').value.trim();
 
@@ -771,7 +1083,15 @@ async function handleSaveEditProduct(e) {
     return;
   }
 
-  const updateData = { name, price, details, imageUrl };
+  const updateData = {
+    name,
+    productName: name,
+    price,
+    stock,
+    details,
+    description: details,
+    imageUrl
+  };
 
   try {
     await fetch(`${FIREBASE_BASE_URL}/products/${id}.json`, {
@@ -784,18 +1104,21 @@ async function handleSaveEditProduct(e) {
   const prod = state.products.find(p => p.id === id);
   if (prod) {
     prod.name = name;
+    prod.productName = name;
     prod.price = price;
+    prod.stock = stock;
     prod.details = details;
+    prod.description = details;
     prod.imageUrl = imageUrl;
   }
 
   closeEditProductModal();
   renderAdminProducts();
-  alertToast(`Product "${name}" updated in Firebase!`);
+  alertToast(`Product "${name}" updated successfully!`);
 }
 
 async function handleAdminDeleteProduct(id, name) {
-  if (!confirm(`Are you sure you want to delete "${name}" from Firebase Realtime Database?`)) return;
+  if (!confirm(`Are you sure you want to remove "${name}" from the store catalog?`)) return;
 
   try {
     await fetch(`${FIREBASE_BASE_URL}/products/${id}.json`, { method: 'DELETE' });
@@ -942,6 +1265,117 @@ function filterByQuery(list, q) {
 // ==========================================
 // 12. Utility & Notification Helpers
 // ==========================================
+function toggleNotificationDropdown(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  const panel = document.getElementById('notificationDropdownPanel');
+  const btn = document.getElementById('notificationBellBtn');
+  if (!panel) return;
+
+  const isOpen = panel.style.display !== 'none';
+  if (isOpen) {
+    closeNotificationDropdown();
+  } else {
+    renderNotificationDropdown();
+    panel.style.display = 'block';
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function closeNotificationDropdown() {
+  const panel = document.getElementById('notificationDropdownPanel');
+  const btn = document.getElementById('notificationBellBtn');
+  if (panel) panel.style.display = 'none';
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+function renderNotificationDropdown() {
+  const body = document.getElementById('notificationDropdownBody');
+  const counter = document.getElementById('notifPanelCounter');
+  if (!body) return;
+
+  const pendingTransactions = state.transactions.filter(t => {
+    const s = (t.status || '').toLowerCase().trim();
+    return s === 'order placed' || s === 'preparing food' || s === 'ready for delivery';
+  });
+
+  if (counter) {
+    counter.innerText = `${pendingTransactions.length} Pending`;
+  }
+
+  if (pendingTransactions.length === 0) {
+    body.innerHTML = `
+      <div class="notif-empty-state">
+        <div class="notif-empty-icon">🔔</div>
+        <div class="notif-empty-title">All Caught Up!</div>
+        <div class="notif-empty-sub">No pending orders waiting for action. All orders are up to date.</div>
+      </div>
+    `;
+    return;
+  }
+
+  body.innerHTML = pendingTransactions.slice(0, 10).map(t => {
+    const rawStatus = t.status || 'Order Placed';
+    const sLower = rawStatus.toLowerCase().trim();
+    let statusClass = 'placed';
+    let icon = '🕒';
+    if (sLower === 'preparing food') {
+      statusClass = 'preparing';
+      icon = '🍳';
+    } else if (sLower === 'ready for delivery') {
+      statusClass = 'ready';
+      icon = '📦';
+    }
+
+    const customerName = escapeHtml(t.customerName || t.customerUsername || 'Customer');
+    const amount = Number(t.totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const orderId = escapeHtml(t.orderId || t.id || 'Order');
+    const dateStr = t.createdAt ? new Date(t.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (t.timestamp || '');
+
+    return `
+      <div class="notif-item">
+        <div class="notif-item-icon">${icon}</div>
+        <div class="notif-item-content">
+          <div class="notif-item-top">
+            <span class="notif-order-id">${orderId}</span>
+            <span class="notif-order-status ${statusClass}">${escapeHtml(rawStatus)}</span>
+          </div>
+          <div class="notif-item-customer">👤 ${customerName} ${dateStr ? `&bull; ${escapeHtml(dateStr)}` : ''}</div>
+          <div class="notif-item-footer">
+            <span class="notif-item-amount">₱${amount}</span>
+            <button type="button" class="notif-action-btn" onclick="openOrderFromNotif('${orderId}')">View in Orders &rarr;</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openOrderFromNotif(orderId) {
+  closeNotificationDropdown();
+  switchView('orders');
+  const searchInput = document.getElementById('globalSearchInput');
+  if (searchInput && orderId) {
+    searchInput.value = orderId;
+    handleGlobalSearch(orderId);
+  }
+}
+
+function openAllOrdersFromNotif() {
+  closeNotificationDropdown();
+  switchView('orders');
+}
+
+// Close notification panel when clicking outside
+document.addEventListener('click', (e) => {
+  const wrapper = document.getElementById('notificationDropdownWrapper');
+  if (wrapper && !wrapper.contains(e.target)) {
+    closeNotificationDropdown();
+  }
+});
+
 function escapeHtml(text) {
   if (!text) return '';
   return text.toString().replace(/[&<>"']/g, m => ({

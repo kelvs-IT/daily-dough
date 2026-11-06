@@ -3,475 +3,433 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Dough - Store Administrator Portal</title>
+  <title>Daily Dough - Handcrafted Artisan Donuts & Specialty Coffee</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Dancing+Script:wght@500;600;700&family=Great+Vibes&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- 1. FULLSCREEN TWO-COLUMN ADMIN LOGIN VIEW -->
-  <div id="viewLogin" class="login-wrapper view-section active">
-    <!-- Left Section: Login Form (Background: #fdb3c4) -->
-    <div class="login-left-section">
-      <div class="login-form-container">
-        <div class="form-header">
-          <h3>Administrator Sign In</h3>
-          <p class="text-muted">Enter administrative credentials to access store controls</p>
+  <!-- WELCOMING STOREFRONT LANDING PAGE -->
+  <div id="viewStorefront" class="storefront-wrapper">
+    <!-- Top Navigation Bar -->
+    <header class="storefront-nav">
+      <div class="storefront-nav-inner">
+        <a href="#hero" class="storefront-brand">
+          <img src="images/daily_dough.png" alt="Daily Dough - Coffee & Donuts" class="storefront-logo">
+        </a>
+
+        <nav class="storefront-menu-links">
+          <a href="#hero" class="nav-item">Home</a>
+          <a href="#menu-showcase" class="nav-item">Our Treats</a>
+          <a href="#coffee-section" class="nav-item">Specialty Coffee</a>
+          <a href="#ordering-section" class="nav-item">Mobile App</a>
+        </nav>
+
+        <div class="storefront-nav-actions">
+          <a href="admin.html" class="btn-admin-login" title="Login">Login</a>
         </div>
+      </div>
+    </header>
 
-        <div id="loginAlert" class="alert-box alert-danger" style="display: none;"></div>
+    <!-- Hero Section -->
+    <section id="hero" class="storefront-hero">
+      <div class="storefront-container hero-grid">
+        <div class="hero-content">
+          <h1 class="hero-headline">Freshly Baked Daily, Handcrafted with Care</h1>
+          <p class="hero-slogan-script">Make every moment sweeter with our delicious donuts and freshly prepared coffee</p>
+          <p class="hero-description">
+            Experience our signature selection of glazed donuts, premium toppings, and freshly pulled espresso drinks. Made fresh each morning using quality ingredients for donut and coffee lovers.
+          </p>
 
-        <form id="loginForm" onsubmit="handleLogin(event)">
-          <div class="form-group" style="margin-bottom: 16px;">
-            <label for="usernameInput">Admin Username *</label>
-            <input type="text" id="usernameInput" class="form-control" placeholder="admin" required autocomplete="username">
+          <div class="hero-cta-group">
+            <a href="#menu-showcase" class="btn-primary-hero">Explore Menu &rarr;</a>
+            <a href="#ordering-section" class="btn-secondary-hero">Order on Mobile App 📱</a>
           </div>
 
-          <div class="form-group" style="margin-bottom: 22px;">
-            <label for="passwordInput">Admin Password *</label>
-            <div style="position: relative; display: flex; align-items: center;">
-              <input type="password" id="passwordInput" class="form-control" placeholder="••••••••" required autocomplete="current-password" style="padding-right: 42px;">
-              <button type="button" id="togglePasswordBtn" onclick="togglePasswordVisibility()" title="Show/Hide Password" style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; font-size: 16px; color: var(--text-muted); padding: 4px;">👁️</button>
+          <!-- Prominent Mobile App Ordering Notice (Replacing Removed Boxes) -->
+          <div class="mobile-order-alert-pill">
+            <span class="pill-icon">📱</span>
+            <div class="pill-content">
+              <strong>Online Ordering is Exclusively via Mobile App</strong>
+              <span>To place an order for delivery or pickup, download the Daily Dough app on your mobile phone.</span>
+            </div>
+            <a href="#ordering-section" class="pill-link">Get App &rarr;</a>
+          </div>
+        </div>
+
+        <div class="hero-media">
+          <div class="hero-artwork-frame">
+            <img src="images/login/donut_coffee.png" alt="Daily Dough Artisan Donut & Roasted Coffee Beans" class="hero-main-img">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Menu Showcase Section -->
+    <section id="menu-showcase" class="storefront-section">
+      <div class="storefront-container">
+        <div class="section-header text-center">
+          <span class="section-tag">DAILY DOUGH MENU</span>
+          <h2 class="section-title">Handcrafted Donuts & Specialty Coffee</h2>
+          <p class="section-desc">Each treat is prepared with passion and paired with premium brewed beverages.</p>
+
+          <!-- Clear Explanatory Banner: Ordering is Mobile-Only -->
+          <div class="menu-order-notice">
+            <span class="notice-icon">🍩</span>
+            <div class="notice-text">
+              <strong>Notice:</strong> Online ordering is available exclusively through the Daily Dough Mobile App. Browse our menu below, then <a href="#ordering-section">download the app to order!</a>
+            </div>
+          </div>
+          
+          <!-- Category Filter Tabs -->
+          <div class="menu-tabs">
+            <button type="button" class="menu-tab-btn active" onclick="filterStorefrontMenu('all', this)">All Items</button>
+            <button type="button" class="menu-tab-btn" onclick="filterStorefrontMenu('donuts', this)">Artisan Donuts</button>
+            <button type="button" class="menu-tab-btn" onclick="filterStorefrontMenu('coffee', this)">Brewed Coffee</button>
+          </div>
+        </div>
+
+        <!-- Product Cards Grid -->
+        <div class="storefront-product-grid" id="storefrontProductGrid">
+          <!-- 1. Pistachio -->
+          <div class="product-item-card" data-category="donuts">
+            <div class="product-item-media">
+              <img src="images/pistachio.png" alt="Pistachio Donut" loading="lazy">
+              <span class="product-tag-chip">Popular</span>
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Pistachio Donut</h3>
+                <span class="product-item-price">₱49.00</span>
+              </div>
+              <p class="product-item-desc">Creamy pistachio glaze topped with crunchy crushed pistachios for a nutty finish.</p>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px; font-weight: 600; font-size: 15px;">Sign in to Dashboard</button>
-        </form>
+          <!-- 2. Matcha Donut -->
+          <div class="product-item-card" data-category="donuts">
+            <div class="product-item-media">
+              <img src="images/matcha_donut.png" alt="Matcha Donut" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Matcha Donut</h3>
+                <span class="product-item-price">₱39.00</span>
+              </div>
+              <p class="product-item-desc">Soft ring donut dipped in vibrant green matcha glaze with an artisanal white chocolate swirl.</p>
+            </div>
+          </div>
 
-        <div class="login-customer-notice">
-          <strong>📱 Customer Notice:</strong><br>
-          Customers must use the <strong>Daily Dough Customer Mobile App</strong>. This portal is strictly restricted to store administrators.
+          <!-- 3. Choco Butternut -->
+          <div class="product-item-card" data-category="donuts">
+            <div class="product-item-media">
+              <img src="images/choco_butternut.png" alt="Choco Butternut" loading="lazy">
+              <span class="product-tag-chip">Classic</span>
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Choco Butternut</h3>
+                <span class="product-item-price">₱39.00</span>
+              </div>
+              <p class="product-item-desc">Classic cake donut generously coated with rich chocolate and crunchy butternut crumbles.</p>
+            </div>
+          </div>
+
+          <!-- 4. Blueberry Donut -->
+          <div class="product-item-card" data-category="donuts">
+            <div class="product-item-media">
+              <img src="images/blueberry_donut.png" alt="Blueberry Donut" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Blueberry Donut</h3>
+                <span class="product-item-price">₱60.00</span>
+              </div>
+              <p class="product-item-desc">Golden glazed donut topped with rich wild blueberry icing and fresh fruit notes.</p>
+            </div>
+          </div>
+
+          <!-- 5. Strawberry Sprinkle Glazed -->
+          <div class="product-item-card" data-category="donuts">
+            <div class="product-item-media">
+              <img src="images/strawberry_sprinkle_glazed.png" alt="Strawberry Sprinkle Glazed" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Strawberry Sprinkle</h3>
+                <span class="product-item-price">₱39.00</span>
+              </div>
+              <p class="product-item-desc">Sweet strawberry glaze topped with colorful candy sprinkles on a fluffy yeast donut.</p>
+            </div>
+          </div>
+
+          <!-- 6. Chocolate Glazed -->
+          <div class="product-item-card" data-category="donuts">
+            <div class="product-item-media">
+              <img src="images/chocolate_glazed.png" alt="Chocolate Glazed" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Chocolate Glazed</h3>
+                <span class="product-item-price">₱39.00</span>
+              </div>
+              <p class="product-item-desc">Soft golden donut dipped in silky decadent chocolate glaze with a delicate white ribbon.</p>
+            </div>
+          </div>
+
+          <!-- 7. Glazed Cheese -->
+          <div class="product-item-card" data-category="donuts">
+            <div class="product-item-media">
+              <img src="images/glazed_cheese.png" alt="Glazed Cheese" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Glazed Cheese</h3>
+                <span class="product-item-price">₱39.00</span>
+              </div>
+              <p class="product-item-desc">Sweet sugar-glazed donut topped with savory shredded cheese for a balanced sweet-savory bite.</p>
+            </div>
+          </div>
+
+          <!-- 8. Bavarian Donut -->
+          <div class="product-item-card" data-category="donuts">
+            <div class="product-item-media">
+              <img src="images/home/bavarian.png" alt="Bavarian Donut" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Bavarian Donut</h3>
+                <span class="product-item-price">₱39.00</span>
+              </div>
+              <p class="product-item-desc">Classic powdered sugar ring donut filled with smooth, luscious vanilla custard cream.</p>
+            </div>
+          </div>
+
+          <!-- 9. Spanish Latte -->
+          <div class="product-item-card" data-category="coffee" id="coffee-section">
+            <div class="product-item-media">
+              <img src="images/Spanish Latte.png" alt="Spanish Latte" loading="lazy">
+              <span class="product-tag-chip">Bestseller</span>
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Spanish Latte</h3>
+                <span class="product-item-price">₱69.00</span>
+              </div>
+              <p class="product-item-desc">Sweet and creamy espresso drink infused with condensed milk and warm steamed milk.</p>
+            </div>
+          </div>
+
+          <!-- 10. Caramel Macchiato -->
+          <div class="product-item-card" data-category="coffee">
+            <div class="product-item-media">
+              <img src="images/Caramel Macchiato.png" alt="Caramel Macchiato" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Caramel Macchiato</h3>
+                <span class="product-item-price">₱99.00</span>
+              </div>
+              <p class="product-item-desc">Fresh steamed milk with vanilla-flavored syrup, marked with espresso and caramel drizzle.</p>
+            </div>
+          </div>
+
+          <!-- 11. Hot Cafe Latte -->
+          <div class="product-item-card" data-category="coffee">
+            <div class="product-item-media">
+              <img src="images/Hot Cafe Latte.png" alt="Hot Cafe Latte" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Hot Cafe Latte</h3>
+                <span class="product-item-price">₱99.00</span>
+              </div>
+              <p class="product-item-desc">Smooth espresso balanced with velvety steamed milk and a delicate top foam layer.</p>
+            </div>
+          </div>
+
+          <!-- 12. Iced Cafe Latte -->
+          <div class="product-item-card" data-category="coffee">
+            <div class="product-item-media">
+              <img src="images/Iced Cafe Latte.png" alt="Iced Cafe Latte" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Iced Cafe Latte</h3>
+                <span class="product-item-price">₱99.00</span>
+              </div>
+              <p class="product-item-desc">Freshly brewed bold espresso poured over chilled fresh milk and crisp ice cubes.</p>
+            </div>
+          </div>
+
+          <!-- 13. Hot Americano -->
+          <div class="product-item-card" data-category="coffee">
+            <div class="product-item-media">
+              <img src="images/Hot Americano.png" alt="Hot Americano" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Hot Americano</h3>
+                <span class="product-item-price">₱69.00</span>
+              </div>
+              <p class="product-item-desc">Espresso shots topped with steaming hot water to create a rich crema and deep aroma.</p>
+            </div>
+          </div>
+
+          <!-- 14. Iced Americano -->
+          <div class="product-item-card" data-category="coffee">
+            <div class="product-item-media">
+              <img src="images/Iced Americano.png" alt="Iced Americano" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Iced Americano</h3>
+                <span class="product-item-price">₱66.00</span>
+              </div>
+              <p class="product-item-desc">Bold espresso shots combined with cold water and ice for a crisp, refreshing coffee.</p>
+            </div>
+          </div>
+
+          <!-- 15. Cappuccino -->
+          <div class="product-item-card" data-category="coffee">
+            <div class="product-item-media">
+              <img src="images/Cappuccino.png" alt="Cappuccino" loading="lazy">
+            </div>
+            <div class="product-item-body">
+              <div class="product-item-header">
+                <h3 class="product-item-title">Cappuccino</h3>
+                <span class="product-item-price">₱69.00</span>
+              </div>
+              <p class="product-item-desc">Rich double espresso layered with equal parts warm steamed milk and dense velvety foam.</p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Right Section: Store Branding (Background: #e8d7b7) -->
-    <div class="login-right-section">
-      <div class="branding-content">
-        <div class="branding-logo-wrap">
-          <img src="images/daily_dough.png" alt="Daily Dough Logo" class="branding-logo">
+    <!-- Ordering Experience Section -->
+    <section id="ordering-section" class="storefront-section bg-warm">
+      <div class="storefront-container">
+        <div class="section-header text-center">
+          <span class="section-tag">ORDER &bull; JUST DOWNLOAD THE APP</span>
+          <h2 class="section-title">Online Ordering is Only on the Mobile Phone</h2>
+          <p class="section-desc">Daily Dough ordering is handled 100% through our customer mobile app for a fast, fresh, and convenient delivery experience.</p>
         </div>
-        <h2 class="branding-title">Daily Dough</h2>
-        <p class="branding-tagline">Coffee &bull; Donuts</p>
-        <div class="branding-divider"></div>
-        <p class="branding-desc">
-          Freshly handcrafted artisan donuts and specialty brewed coffee. Store administrator operations, live order fulfillment, and menu management.
-        </p>
+
+        <div class="ordering-steps-grid">
+          <div class="step-card">
+            <div class="step-num">01</div>
+            <div class="step-icon">📱</div>
+            <h3 class="step-title">Download Mobile App</h3>
+            <p class="step-desc">Get the Daily Dough app on your mobile phone to view our daily fresh bakes, live prices, and flavor menus.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-num">02</div>
+            <div class="step-icon">💳</div>
+            <h3 class="step-title">Flexible Checkout</h3>
+            <p class="step-desc">Order with your preferred payment method: <strong>Cash on Delivery (COD)</strong>, <strong>GCash</strong>, or <strong>Credit/Debit Card</strong>.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-num">03</div>
+            <div class="step-icon">🛵</div>
+            <h3 class="step-title">Live Fulfillment Tracking</h3>
+            <p class="step-desc">Track your treat through live order stages: Order Placed, Preparing Food, Ready, Out for Delivery, and Delivered.</p>
+          </div>
+        </div>
+
+        <!-- Role Architecture / Storefront Callout -->
+        <div class="customer-mobile-callout">
+          <div class="callout-content">
+            <h3>📱 Daily Dough Customer Mobile App</h3>
+            <p>Customers can order treats, save delivery addresses, and track real-time fulfillment through our dedicated Android & iOS mobile app.</p>
+          </div>
+          <div class="callout-action">
+            <button type="button" class="btn-primary-hero" onclick="alertToast('Download the Daily Dough app on your mobile phone to start ordering!')">Download App to Order</button>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="storefront-footer">
+      <div class="storefront-container footer-content">
+        <div class="footer-brand-col">
+          <img src="images/daily_dough.png" alt="Daily Dough Logo" class="footer-logo">
+          <p class="footer-tagline">Freshly handcrafted artisan donuts and specialty brewed coffee.</p>
+          <div class="footer-hours">
+            <span>🕒 Open Daily: <strong>7:00 AM &ndash; 9:00 PM</strong></span>
+          </div>
+        </div>
+
+        <div class="footer-links-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#menu-showcase">Artisan Donuts</a></li>
+            <li><a href="#coffee-section">Specialty Coffee</a></li>
+            <li><a href="#ordering-section">Mobile Ordering</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <h4>Accepted Payments</h4>
+          <div class="payment-badges">
+            <span class="pay-chip">💵 Cash on Delivery</span>
+            <span class="pay-chip">📱 GCash</span>
+            <span class="pay-chip">💳 Credit / Debit Card</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="storefront-container footer-bottom-inner">
+          <p>&copy; 2026 Daily Dough. Handcrafted with passion. All rights reserved.</p>
+          <div class="footer-portal-link">
+            <a href="admin.html" title="Login">Login &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
 
-  <!-- 2. MAIN ADMIN WORKSPACE (SIDEBAR + CONTENT) -->
-  <div id="adminWorkspace" class="admin-layout" style="display: none;">
+  <!-- Toast Notification element -->
+  <div id="toastNotification" class="toast-popup" style="display: none;"></div>
 
-    <!-- Fixed Left Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <img src="images/daily_dough.png" alt="Daily Dough Logo" class="sidebar-logo">
-        <div class="sidebar-title">
-          <h1>Daily Dough</h1>
-          <span>Admin Workspace</span>
-        </div>
-      </div>
+  <script>
+    function filterStorefrontMenu(category, btn) {
+      const buttons = document.querySelectorAll('.menu-tab-btn');
+      buttons.forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
 
-      <nav class="sidebar-menu">
-        <div class="menu-category">Main Menu</div>
-        <button class="sidebar-link active" id="navDashboard" onclick="switchView('dashboard')">
-          <span>Dashboard</span>
-        </button>
-        <button class="sidebar-link" id="navOrders" onclick="switchView('orders')">
-          <span>Orders Management</span>
-        </button>
-        <button class="sidebar-link" id="navProducts" onclick="switchView('products')">
-          <span>Products Catalog</span>
-        </button>
+      const cards = document.querySelectorAll('.product-item-card');
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category');
+        if (category === 'all' || cat === category) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
 
-        <div class="menu-category" style="margin-top: 14px;">Store Management</div>
-        <button class="sidebar-link" id="navCustomers" onclick="switchView('customers')">
-          <span>Customers</span>
-        </button>
-        <button class="sidebar-link" id="navPayments" onclick="switchView('payments')">
-          <span>Payments & Sales</span>
-        </button>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="admin-profile">
-          <div class="admin-avatar">A</div>
-          <div class="admin-info">
-            <div class="name">Store Admin</div>
-            <div class="role">admin@dailydough</div>
-          </div>
-        </div>
-        <button class="logout-icon-btn" onclick="handleLogout()" title="Logout">🚪</button>
-      </div>
-    </aside>
-
-    <!-- Right Workspace Area -->
-    <div class="main-wrapper">
-
-      <!-- Top Header Navigation -->
-      <header class="top-header">
-        <div class="header-search">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="globalSearchInput" placeholder="Quick search orders, customer, products..." oninput="handleGlobalSearch(this.value)">
-        </div>
-
-        <div class="header-right">
-          <!-- Live Firebase Connection Pill -->
-          <div class="status-pill" id="firebaseBadge" title="Target: https://dailydough-5480d-default-rtdb.firebaseio.com">
-            <span class="status-dot"></span>
-            <span id="firebaseStatusText">Firebase RTDB: Connected</span>
-          </div>
-
-          <!-- Pending Order Alert Notification -->
-          <button class="notification-badge-btn" onclick="switchView('orders')" title="Active Pending Orders">
-            <span>🔔</span>
-            <span class="badge-count" id="headerPendingCount">0</span>
-          </button>
-        </div>
-      </header>
-
-      <!-- Content Views Stage -->
-      <main class="content-area">
-
-        <!-- VIEW: DASHBOARD OVERVIEW -->
-        <section id="viewDashboard" class="view-section">
-          <div class="page-title-bar">
-            <div>
-              <h2>Store Dashboard Overview</h2>
-              <p>Key business indicators and real-time sales activities from Firebase RTDB</p>
-            </div>
-            <div>
-              <button class="btn btn-outline btn-sm" onclick="refreshAllData()">🔄 Sync Store Data</button>
-            </div>
-          </div>
-
-          <!-- Metric Cards Grid -->
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-icon-wrap" style="background: #fef3c7; color: #b45309;">💰</div>
-              <div class="metric-details">
-                <div class="label">Total Store Sales</div>
-                <div class="value" id="kpiRevenue">₱0.00</div>
-                <div class="sub">From real database orders</div>
-              </div>
-            </div>
-
-            <div class="metric-card">
-              <div class="metric-icon-wrap" style="background: #eff6ff; color: #1d4ed8;">📦</div>
-              <div class="metric-details">
-                <div class="label">Total Orders</div>
-                <div class="value" id="kpiOrders">0</div>
-                <div class="sub">Lifetime customer checkouts</div>
-              </div>
-            </div>
-
-            <div class="metric-card">
-              <div class="metric-icon-wrap" style="background: #fff7ed; color: #c2410c;">🍳</div>
-              <div class="metric-details">
-                <div class="label">Pending Fulfillment</div>
-                <div class="value" id="kpiPendingOrders">0</div>
-                <div class="sub" style="color: #c2410c;">Requires kitchen action</div>
-              </div>
-            </div>
-
-            <div class="metric-card">
-              <div class="metric-icon-wrap" style="background: #ecfdf5; color: #15803d;">✅</div>
-              <div class="metric-details">
-                <div class="label">Completed Orders</div>
-                <div class="value" id="kpiCompletedOrders">0</div>
-                <div class="sub">Successfully delivered</div>
-              </div>
-            </div>
-
-            <div class="metric-card">
-              <div class="metric-icon-wrap" style="background: #fdf4ff; color: #9333ea;">👥</div>
-              <div class="metric-details">
-                <div class="label">Registered Customers</div>
-                <div class="value" id="kpiCustomers">0</div>
-                <div class="sub">Mobile app accounts</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Analytics Row (Real Sales Activity SVG Chart + Category Breakdown) -->
-          <div class="analytics-row">
-            <div class="chart-card">
-              <div class="chart-header">
-                <div>
-                  <h3 style="font-size: 16px;">Sales Activity Trend</h3>
-                  <span style="font-size: 12px; color: var(--text-muted);">Real order totals calculated from Firebase transaction timestamps</span>
-                </div>
-                <span class="badge" style="background: #ecfdf5; color: #166534;">Live Database Data</span>
-              </div>
-              <div class="chart-container" id="salesChartContainer">
-                <!-- SVG Chart injected dynamically based on real data -->
-              </div>
-            </div>
-
-            <div class="distribution-card">
-              <h3 style="font-size: 16px;">Menu Items Ordered</h3>
-              <span style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Breakdown based on actual ordered items</span>
-              <div class="distribution-list" id="distributionList">
-                <!-- Rendered dynamically -->
-              </div>
-            </div>
-          </div>
-
-          <!-- Recent Orders Section -->
-          <div class="card-table-wrap">
-            <div class="table-toolbar">
-              <h3>🕒 Recent Store Transactions</h3>
-              <button class="btn btn-outline btn-sm" onclick="switchView('orders')">View All Orders &rarr;</button>
-            </div>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Customer</th>
-                  <th>Order Date</th>
-                  <th>Items Summary</th>
-                  <th>Payment</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Stage Progression</th>
-                </tr>
-              </thead>
-              <tbody id="dashboardRecentOrdersBody">
-                <!-- Injected dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- VIEW: ORDERS MANAGEMENT -->
-        <section id="viewOrders" class="view-section">
-          <div class="page-title-bar">
-            <div>
-              <h2>Orders Management</h2>
-              <p>Monitor live orders, review order summaries, and advance stages in Firebase RTDB</p>
-            </div>
-            <div style="display: flex; gap: 10px;">
-              <select id="ordersFilterSelect" class="form-control" style="width: 190px;" onchange="filterOrders(this.value)">
-                <option value="ALL">All Order Stages</option>
-                <option value="Order Placed">Order Placed</option>
-                <option value="Preparing Food">Preparing Food</option>
-                <option value="Ready for Delivery">Ready for Delivery</option>
-                <option value="Out for Delivery">Out for Delivery</option>
-                <option value="Order Delivered">Order Delivered</option>
-                <option value="Completed">Completed</option>
-              </select>
-              <button class="btn btn-outline btn-sm" onclick="refreshTransactions()">🔄 Refresh</button>
-            </div>
-          </div>
-
-          <div class="card-table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Customer Info</th>
-                  <th>Delivery Address</th>
-                  <th>Items & Quantities</th>
-                  <th>Payment</th>
-                  <th>Total Amount</th>
-                  <th>Current Status</th>
-                  <th>Update Order Stage</th>
-                </tr>
-              </thead>
-              <tbody id="ordersTableBody">
-                <!-- Injected dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- VIEW: PRODUCTS CATALOG -->
-        <section id="viewProducts" class="view-section">
-          <div class="page-title-bar">
-            <div>
-              <h2>Products Catalog</h2>
-              <p>Create, update, and manage Daily Dough menu items stored in Firebase <code>/products</code></p>
-            </div>
-            <button class="btn btn-accent btn-sm" onclick="document.getElementById('adminNewName').focus()">➕ Add New Product</button>
-          </div>
-
-          <!-- Add Product Form Card -->
-          <div class="form-card">
-            <h3 style="font-size: 16px; margin-bottom: 4px;">➕ Add Product to Menu</h3>
-            <span style="font-size: 12px; color: var(--text-muted);">Newly added products will immediately become available in the store</span>
-            <form id="adminAddProductForm" onsubmit="handleAdminAddProduct(event)">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label for="adminNewName">Product Name *</label>
-                  <input type="text" id="adminNewName" class="form-control" placeholder="e.g. Vanilla Glazed Donut" required>
-                </div>
-                <div class="form-group">
-                  <label for="adminNewPrice">Price (₱) *</label>
-                  <input type="number" step="1" id="adminNewPrice" class="form-control" placeholder="49" required>
-                </div>
-                <div class="form-group">
-                  <label for="adminNewImageUrl">Photo / Asset URL *</label>
-                  <input type="text" id="adminNewImageUrl" class="form-control" placeholder="assets/images/... or https://" required>
-                </div>
-                <div class="form-group">
-                  <label for="adminNewDetails">Description / Details</label>
-                  <input type="text" id="adminNewDetails" class="form-control" placeholder="Freshly glazed daily treat">
-                </div>
-              </div>
-              <div style="margin-top: 18px; text-align: right;">
-                <button type="submit" class="btn btn-primary">Save to Firebase Catalog</button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Products Table -->
-          <div class="card-table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th style="width: 60px;">Image</th>
-                  <th>Product Name</th>
-                  <th>Price (₱)</th>
-                  <th>Description / Details</th>
-                  <th style="text-align: right;">Admin Actions</th>
-                </tr>
-              </thead>
-              <tbody id="productsTableBody">
-                <!-- Injected dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- VIEW: CUSTOMERS -->
-        <section id="viewCustomers" class="view-section">
-          <div class="page-title-bar">
-            <div>
-              <h2>Registered Customers</h2>
-              <p>Customer accounts registered via mobile app. Sensitive credentials like passwords are strictly omitted.</p>
-            </div>
-            <button class="btn btn-outline btn-sm" onclick="refreshCustomers()">🔄 Refresh Customers</button>
-          </div>
-
-          <div class="card-table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Customer Name</th>
-                  <th>Email Address</th>
-                  <th>Username</th>
-                  <th>Phone Number</th>
-                  <th>Registered On</th>
-                  <th>Orders Count</th>
-                  <th>Account Type</th>
-                </tr>
-              </thead>
-              <tbody id="customersTableBody">
-                <!-- Injected dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- VIEW: PAYMENTS & SALES -->
-        <section id="viewPayments" class="view-section">
-          <div class="page-title-bar">
-            <div>
-              <h2>Payment Management & Breakdown</h2>
-              <p>Real-time distribution of collections across customer payment methods</p>
-            </div>
-            <button class="btn btn-outline btn-sm" onclick="refreshTransactions()">🔄 Refresh Records</button>
-          </div>
-
-          <!-- Payment Summary Cards -->
-          <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
-            <div class="metric-card">
-              <div class="metric-icon-wrap" style="background: #fff7ed; color: #ea580c;">💵</div>
-              <div class="metric-details">
-                <div class="label">Cash on Delivery (COD)</div>
-                <div class="value" id="payCodTotal">₱0.00</div>
-                <div class="sub" id="payCodCount">0 orders</div>
-              </div>
-            </div>
-
-            <div class="metric-card">
-              <div class="metric-icon-wrap" style="background: #f0f9ff; color: #0284c7;">📱</div>
-              <div class="metric-details">
-                <div class="label">GCash e-Wallet</div>
-                <div class="value" id="payGcashTotal">₱0.00</div>
-                <div class="sub" id="payGcashCount">0 orders</div>
-              </div>
-            </div>
-
-            <div class="metric-card">
-              <div class="metric-icon-wrap" style="background: #eff6ff; color: #2563eb;">💳</div>
-              <div class="metric-details">
-                <div class="label">Credit / Debit Card</div>
-                <div class="value" id="payCardTotal">₱0.00</div>
-                <div class="sub" id="payCardCount">0 orders</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Clean Status Note -->
-          <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-              <div style="font-weight: 600; font-size: 14px; color: var(--text-main);">Payment Ledger Overview</div>
-              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
-                Summary metrics above reflect all verified customer checkouts synchronized from Firebase RTDB.
-              </div>
-            </div>
-            <span class="badge" style="background: #ecfdf5; color: #166534; font-size: 12px; padding: 6px 12px;">Verified RTDB Stream</span>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  </div>
-
-  <!-- EDIT PRODUCT MODAL -->
-  <div class="modal-backdrop" id="editProductModal" style="display: none;">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 style="font-size: 18px;">✏️ Edit Store Product</h3>
-        <button class="close-btn" onclick="closeEditProductModal()">&times;</button>
-      </div>
-
-      <form id="editProductForm" onsubmit="handleSaveEditProduct(event)">
-        <input type="hidden" id="editProdId">
-
-        <div class="form-group" style="margin-bottom: 14px;">
-          <label for="editProdName">Product Name *</label>
-          <input type="text" id="editProdName" class="form-control" required>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 14px;">
-          <label for="editProdPrice">Price (₱) *</label>
-          <input type="number" step="1" id="editProdPrice" class="form-control" required>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 14px;">
-          <label for="editProdImageUrl">Photo / Asset URL *</label>
-          <input type="text" id="editProdImageUrl" class="form-control" required>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 20px;">
-          <label for="editProdDetails">Details / Description</label>
-          <textarea id="editProdDetails" class="form-control" rows="2"></textarea>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px;">
-          <button type="button" class="btn btn-outline" onclick="closeEditProductModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Update in Firebase</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
+    function alertToast(msg) {
+      let toast = document.getElementById('toastNotification');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toastNotification';
+        toast.className = 'toast-popup';
+        document.body.appendChild(toast);
+      }
+      toast.innerText = msg;
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 4000);
+    }
+  </script>
 </body>
 </html>

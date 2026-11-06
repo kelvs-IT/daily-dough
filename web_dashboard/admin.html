@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Dough - Store Administrator Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Dancing+Script:wght@500;600;700&family=Great+Vibes&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 1. FULLSCREEN TWO-COLUMN ADMIN LOGIN VIEW (MATCHING REFERENCE SCREENSHOT) -->
+  <div id="viewLogin" class="login-wrapper view-section">
+    <!-- Left Section: Login Form & Branding (Background: #C0B3A2) -->
+    <div class="login-left-section">
+      <div class="ref-login-container">
+        <!-- Back to Storefront Link -->
+        <div class="ref-back-row">
+          <a href="index.html" class="ref-back-to-store" title="Return to store homepage">
+            &larr; Back to Store
+          </a>
+        </div>
+
+        <!-- Daily Dough Logo -->
+        <div class="ref-logo-wrap">
+          <img src="images/daily_dough.png" alt="Daily Dough - Coffee & Donuts" class="ref-login-logo">
+        </div>
+
+        <div id="loginAlert" class="alert-box alert-danger" style="display: none; margin-bottom: 16px; border-radius: 12px; font-size: 13px;"></div>
+
+        <!-- Form Elements -->
+        <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="on">
+          <!-- Username Input -->
+          <div class="ref-input-group">
+            <input type="text" id="usernameInput" class="ref-pill-input" placeholder="USERNAME" required autocomplete="username">
+          </div>
+
+          <!-- Password Input with Toggle Icon -->
+          <div class="ref-input-group ref-password-wrapper">
+            <input type="password" id="passwordInput" class="ref-pill-input" placeholder="PASSWORD" required autocomplete="current-password">
+            <button type="button" id="togglePasswordBtn" class="ref-eye-btn" onclick="togglePasswordVisibility()" title="Show/Hide Password" aria-label="Toggle password visibility">
+              <svg class="eye-icon eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+              <svg class="eye-icon eye-on" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Remember Me Checkbox -->
+          <div class="ref-remember-row">
+            <label class="ref-checkbox-label">
+              <input type="checkbox" id="rememberMeCheckbox" class="ref-checkbox">
+              <span class="ref-remember-text">remember me</span>
+            </label>
+          </div>
+
+          <!-- Login Button -->
+          <div class="ref-btn-row">
+            <button type="submit" class="ref-pill-btn ref-login-btn">LOGIN</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Section: Donut & Coffee Visual + Slogan (Background: #FDB3C4) -->
+    <div class="login-right-section">
+      <div class="ref-visual-container">
+        <!-- Donut & Coffee Beans Artwork -->
+        <div class="ref-artwork-wrap">
+          <img src="images/login/donut_coffee.png" alt="Delicious Donut and Freshly Prepared Coffee" class="ref-artwork-img">
+        </div>
+
+        <!-- Cursive Slogan -->
+        <div class="ref-slogan-wrap">
+          <p class="ref-slogan-line">Make every moment sweeter with our delicious donuts</p>
+          <p class="ref-slogan-line">and freshly prepared coffee</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MAIN ADMIN WORKSPACE (SIDEBAR + CONTENT) -->
+  <div id="adminWorkspace" class="admin-layout" style="display: none;">
+
+    <!-- Fixed Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header admin-brand-card">
+        <img src="images/daily_dough.png" alt="Daily Dough Logo" class="admin-brand-logo">
+        <span class="admin-brand-label">ADMIN</span>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div class="menu-category">Main Menu</div>
+        <button class="sidebar-link active" id="navDashboard" onclick="switchView('dashboard')">
+          <span>Dashboard</span>
+        </button>
+        <button class="sidebar-link" id="navOrders" onclick="switchView('orders')">
+          <span>Orders Management</span>
+        </button>
+        <button class="sidebar-link" id="navProducts" onclick="switchView('products')">
+          <span>Products Catalog</span>
+        </button>
+
+        <div class="menu-category" style="margin-top: 14px;">Store Management</div>
+        <button class="sidebar-link" id="navCustomers" onclick="switchView('customers')">
+          <span>Customers</span>
+        </button>
+        <button class="sidebar-link" id="navPayments" onclick="switchView('payments')">
+          <span>Payments & Sales</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-profile">
+          <div class="admin-avatar">A</div>
+          <div class="admin-info">
+            <div class="name">Store Admin</div>
+            <div class="role">admin@dailydough</div>
+          </div>
+        </div>
+        <button type="button" class="logout-icon-btn" onclick="handleLogout()" title="Logout" aria-label="Logout">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Right Workspace Area -->
+    <div class="main-wrapper">
+
+      <!-- Top Header Navigation -->
+      <header class="top-header">
+        <div class="header-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="globalSearchInput" placeholder="Quick search orders, customer, products..." oninput="handleGlobalSearch(this.value)">
+        </div>
+
+        <div class="header-right">
+          <!-- Quick Storefront Link -->
+          <a href="index.html" class="btn btn-outline btn-sm" style="text-decoration: none;">🏪 View Storefront</a>
+
+          <!-- Notification Bell & Dropdown Wrapper -->
+          <div class="notification-dropdown-wrapper" id="notificationDropdownWrapper">
+            <button type="button" class="notification-badge-btn" id="notificationBellBtn" onclick="toggleNotificationDropdown(event)" title="Notifications" aria-label="Toggle notifications dropdown" aria-expanded="false">
+              <span>🔔</span>
+              <span class="badge-count" id="headerPendingCount">0</span>
+            </button>
+
+            <!-- Notification Dropdown Panel -->
+            <div class="notification-dropdown-panel" id="notificationDropdownPanel" style="display: none;">
+              <div class="notification-dropdown-header">
+                <div class="notif-title-group">
+                  <h4>Notifications</h4>
+                  <span class="notif-counter-pill" id="notifPanelCounter">0 Pending</span>
+                </div>
+                <button type="button" class="notif-close-btn" onclick="closeNotificationDropdown()" title="Close notifications">&times;</button>
+              </div>
+
+              <div class="notification-dropdown-body" id="notificationDropdownBody">
+                <!-- Injected dynamically based on real state.transactions -->
+              </div>
+
+              <div class="notification-dropdown-footer">
+                <button type="button" class="notif-view-all-btn" onclick="openAllOrdersFromNotif()">
+                  <span>View All in Orders Management &rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Views Stage -->
+      <main class="content-area">
+
+        <!-- VIEW: DASHBOARD OVERVIEW -->
+        <section id="viewDashboard" class="view-section">
+          <div class="page-title-bar">
+            <div>
+              <h2>Store Dashboard Overview</h2>
+              <p>Real-time store sales, order volume, and fulfillment performance</p>
+            </div>
+            <div>
+              <button class="btn btn-outline btn-sm" onclick="refreshAllData()">🔄 Refresh Store Data</button>
+            </div>
+          </div>
+
+          <!-- Metric Cards Grid -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: #fef3c7; color: #b45309;">💰</div>
+              <div class="metric-details">
+                <div class="label">Total Store Sales</div>
+                <div class="value" id="kpiRevenue">₱0.00</div>
+                <div class="sub">Calculated from verified customer orders</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: #eff6ff; color: #1d4ed8;">📦</div>
+              <div class="metric-details">
+                <div class="label">Total Orders</div>
+                <div class="value" id="kpiOrders">0</div>
+                <div class="sub">Lifetime customer checkouts</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: #fff7ed; color: #c2410c;">🍳</div>
+              <div class="metric-details">
+                <div class="label">Pending Fulfillment</div>
+                <div class="value" id="kpiPendingOrders">0</div>
+                <div class="sub" style="color: #c2410c;">Requires kitchen action</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: #ecfdf5; color: #15803d;">✅</div>
+              <div class="metric-details">
+                <div class="label">Completed Orders</div>
+                <div class="value" id="kpiCompletedOrders">0</div>
+                <div class="sub">Successfully delivered</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: #fdf4ff; color: #9333ea;">👥</div>
+              <div class="metric-details">
+                <div class="label">Registered Customers</div>
+                <div class="value" id="kpiCustomers">0</div>
+                <div class="sub">Active customer accounts</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics Row (Real Sales Activity SVG Chart + Category Breakdown) -->
+          <div class="analytics-row">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <h3 style="font-size: 16px;">Sales Activity Trend</h3>
+                  <span style="font-size: 12px; color: var(--text-muted);">Recent sales performance and transaction volume</span>
+                </div>
+                <span class="badge" style="background: #ecfdf5; color: #166534;">Live Store Activity</span>
+              </div>
+              <div class="chart-container" id="salesChartContainer">
+                <!-- SVG Chart injected dynamically based on real data -->
+              </div>
+            </div>
+
+            <div class="distribution-card">
+              <h3 style="font-size: 16px;">Menu Items Ordered</h3>
+              <span style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Breakdown based on actual ordered items</span>
+              <div class="distribution-list" id="distributionList">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Orders Section -->
+          <div class="card-table-wrap">
+            <div class="table-toolbar">
+              <h3>🕒 Recent Store Transactions</h3>
+              <button class="btn btn-outline btn-sm" onclick="switchView('orders')">View All Orders &rarr;</button>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Order Date</th>
+                  <th>Items Summary</th>
+                  <th>Payment</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Stage Progression</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardRecentOrdersBody">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW: ORDERS MANAGEMENT -->
+        <section id="viewOrders" class="view-section">
+          <div class="page-title-bar">
+            <div>
+              <h2>Orders Management</h2>
+              <p>Review incoming orders, customer details, and track kitchen prep</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <select id="ordersFilterSelect" class="form-control" style="width: 190px;" onchange="filterOrders(this.value)">
+                <option value="ALL">All Order Stages</option>
+                <option value="Order Placed">Order Placed</option>
+                <option value="Preparing Food">Preparing Food</option>
+                <option value="Ready for Delivery">Ready for Delivery</option>
+                <option value="Out for Delivery">Out for Delivery</option>
+                <option value="Order Delivered">Order Delivered</option>
+                <option value="Completed">Completed</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="refreshTransactions()">🔄 Refresh</button>
+            </div>
+          </div>
+
+          <div class="card-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Info</th>
+                  <th>Delivery Address</th>
+                  <th>Items & Quantities</th>
+                  <th>Payment</th>
+                  <th>Total Amount</th>
+                  <th>Current Status</th>
+                  <th>Update Order Stage</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW: PRODUCTS CATALOG -->
+        <section id="viewProducts" class="view-section">
+          <div class="page-title-bar">
+            <div>
+              <h2>Products Catalog</h2>
+              <p>Manage bakery and specialty coffee catalog offerings</p>
+            </div>
+            <button class="btn btn-accent btn-sm" onclick="document.getElementById('adminNewName').focus()">➕ Add New Product</button>
+          </div>
+
+          <!-- Add Product Form Card -->
+          <div class="form-card">
+            <h3 style="font-size: 16px; margin-bottom: 4px;">➕ Add Product to Menu</h3>
+            <span style="font-size: 12px; color: var(--text-muted);">Newly added products will immediately become available in the store</span>
+            <form id="adminAddProductForm" onsubmit="handleAdminAddProduct(event)">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="adminNewName">Product Name *</label>
+                  <input type="text" id="adminNewName" class="form-control" placeholder="e.g. Vanilla Glazed Donut" required>
+                </div>
+                <div class="form-group">
+                  <label for="adminNewPrice">Price (₱) *</label>
+                  <input type="number" step="1" id="adminNewPrice" class="form-control" placeholder="49" required>
+                </div>
+                <div class="form-group">
+                  <label for="adminNewStock">Stock Quantity *</label>
+                  <input type="number" step="1" id="adminNewStock" class="form-control" placeholder="50" value="50" required>
+                </div>
+                <div class="form-group">
+                  <label for="adminNewImageUrl">Photo / Asset URL *</label>
+                  <input type="text" id="adminNewImageUrl" class="form-control" placeholder="assets/images/... or https://" required>
+                </div>
+                <div class="form-group">
+                  <label for="adminNewDetails">Description / Details</label>
+                  <input type="text" id="adminNewDetails" class="form-control" placeholder="Freshly glazed daily treat">
+                </div>
+              </div>
+              <div style="margin-top: 18px; text-align: right;">
+                <button type="submit" class="btn btn-primary">Save Product to Menu</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Products Table -->
+          <div class="card-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 60px;">Image</th>
+                  <th>Product Name</th>
+                  <th>Price (₱)</th>
+                  <th>Stock</th>
+                  <th>Description / Details</th>
+                  <th style="text-align: right;">Admin Actions</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW: CUSTOMERS -->
+        <section id="viewCustomers" class="view-section">
+          <div class="page-title-bar">
+            <div>
+              <h2>Registered Customers</h2>
+              <p>Customer profiles registered through the Daily Dough ordering app.</p>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="refreshCustomers()">🔄 Refresh Customers</button>
+          </div>
+
+          <div class="card-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Customer Name</th>
+                  <th>Email Address</th>
+                  <th>Username</th>
+                  <th>Phone Number</th>
+                  <th>Registered On</th>
+                  <th>Orders Count</th>
+                  <th>Account Type</th>
+                </tr>
+              </thead>
+              <tbody id="customersTableBody">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW: PAYMENTS & SALES -->
+        <section id="viewPayments" class="view-section">
+          <div class="page-title-bar">
+            <div>
+              <h2>Payment Management & Breakdown</h2>
+              <p>Real-time distribution of collections across customer payment methods</p>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="refreshTransactions()">🔄 Refresh Records</button>
+          </div>
+
+          <!-- Payment Summary Cards -->
+          <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: #fff7ed; color: #ea580c;">💵</div>
+              <div class="metric-details">
+                <div class="label">Cash on Delivery (COD)</div>
+                <div class="value" id="payCodTotal">₱0.00</div>
+                <div class="sub" id="payCodCount">0 orders</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: #f0f9ff; color: #0284c7;">📱</div>
+              <div class="metric-details">
+                <div class="label">GCash e-Wallet</div>
+                <div class="value" id="payGcashTotal">₱0.00</div>
+                <div class="sub" id="payGcashCount">0 orders</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: #eff6ff; color: #2563eb;">💳</div>
+              <div class="metric-details">
+                <div class="label">Credit / Debit Card</div>
+                <div class="value" id="payCardTotal">₱0.00</div>
+                <div class="sub" id="payCardCount">0 orders</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clean Status Note -->
+          <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-weight: 600; font-size: 14px; color: var(--text-main);">Payment Ledger Overview</div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                Summary metrics reflect all completed customer transactions.
+              </div>
+            </div>
+            <span class="badge" style="background: #ecfdf5; color: #166534; font-size: 12px; padding: 6px 12px;">Verified Ledger</span>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- EDIT PRODUCT MODAL -->
+  <div class="modal-backdrop" id="editProductModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 18px;">✏️ Edit Store Product</h3>
+        <button class="close-btn" onclick="closeEditProductModal()">&times;</button>
+      </div>
+
+      <form id="editProductForm" onsubmit="handleSaveEditProduct(event)">
+        <input type="hidden" id="editProdId">
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="editProdName">Product Name *</label>
+          <input type="text" id="editProdName" class="form-control" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="editProdPrice">Price (₱) *</label>
+          <input type="number" step="1" id="editProdPrice" class="form-control" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="editProdStock">Stock Quantity *</label>
+          <input type="number" step="1" id="editProdStock" class="form-control" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="editProdImageUrl">Photo / Asset URL *</label>
+          <input type="text" id="editProdImageUrl" class="form-control" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label for="editProdDetails">Details / Description</label>
+          <textarea id="editProdDetails" class="form-control" rows="2"></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-outline" onclick="closeEditProductModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase App & Authentication SDKs (Compat v10) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
