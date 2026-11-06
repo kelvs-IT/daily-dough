@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Daily Dough – Complete System Overview and Database Structure</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm 15mm 20mm 15mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+      background-color: #ffffff;
+      padding: 0;
+      margin: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px;
+    }
+    .header-box {
+      border-bottom: 3px solid #624B1D;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    h1 {
+      color: #624B1D;
+      font-size: 26px;
+      margin-top: 0;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .subtitle {
+      font-size: 16px;
+      font-weight: 600;
+      color: #D95B1E;
+      margin-bottom: 12px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      background: #FDFBF8;
+      border: 1px solid #E2D9CF;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+    }
+    .meta-item strong {
+      color: #624B1D;
+    }
+    h2 {
+      color: #624B1D;
+      font-size: 19px;
+      border-bottom: 1.5px solid #E2E8F0;
+      padding-bottom: 6px;
+      margin-top: 32px;
+      margin-bottom: 14px;
+      page-break-after: avoid;
+    }
+    h3 {
+      color: #D95B1E;
+      font-size: 15px;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      page-break-after: avoid;
+    }
+    p, li {
+      font-size: 13.5px;
+      color: #334155;
+    }
+    ul, ol {
+      padding-left: 20px;
+      margin-top: 6px;
+      margin-bottom: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px 0;
+      font-size: 12px;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #CBD5E1;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #624B1D;
+      color: #ffffff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background-color: #F8FAFC;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-green {
+      background-color: #DCFCE7;
+      color: #15803D;
+      border: 1px solid #86EFAC;
+    }
+    .badge-yellow {
+      background-color: #FEF3C7;
+      color: #B45309;
+      border: 1px solid #FDE68A;
+    }
+    pre {
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      padding: 12px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 11.5px;
+      overflow-x: auto;
+      line-height: 1.45;
+      page-break-inside: avoid;
+    }
+    .diagram-card {
+      background: #FAFAF9;
+      border: 1.5px solid #E7E5E4;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      page-break-inside: avoid;
+    }
+    .diagram-title {
+      font-weight: 700;
+      color: #624B1D;
+      font-size: 13px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .callout {
+      background-color: #EFF6FF;
+      border-left: 4px solid #3B82F6;
+      padding: 10px 14px;
+      margin: 14px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+    }
+    .callout-title {
+      font-weight: bold;
+      color: #1D4ED8;
+      margin-bottom: 4px;
+    }
+    @media print {
+      .container {
+        padding: 0;
+        max-width: 100%;
+      }
+      h2 {
+        page-break-before: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-box">
+      <h1>Daily Dough: System Overview & Database Structure</h1>
+      <div class="subtitle">An On-Demand E-Commerce Platform for Donut Ordering and Delivery</div>
+      <div class="meta-grid">
+        <div class="meta-item"><strong>Course:</strong> ITE 7 – Application Development & Emerging Technologies</div>
+        <div class="meta-item"><strong>Platform:</strong> Flutter (Android) & Web Admin Dashboard</div>
+        <div class="meta-item"><strong>Backend Database:</strong> Google Firebase Realtime Database (RTDB)</div>
+        <div class="meta-item"><strong>Documentation Release:</strong> Version 2.0 (Official Capstone & Defense Guide)</div>
+      </div>
+    </div>
+
+    <h2>1. Executive Summary & Project Description</h2>
+    <p><strong>Daily Dough</strong> is an integrated mobile and web e-commerce solution engineered to digitize the ordering, culinary preparation, delivery tracking, and administrative orchestration of fresh handcrafted donuts, specialty pastries, and premium brewed coffee beverages. The platform pairs a high-performance native Flutter Android client with a lightweight responsive Web Admin Dashboard, powered by Google Firebase Realtime Database via direct REST APIs over HTTPS.</p>
+
+    <h2>2. System Architecture & Component Design</h2>
+    <p>The system follows a <strong>Serverless Client-Cloud Decoupled Architecture</strong>. Both client applications communicate directly with Google Firebase services without requiring an intermediate custom server.</p>
+
+    <div class="diagram-card">
+      <div class="diagram-title">System Architecture Overview</div>
+      <pre>
++------------------------------------+       +------------------------------------+
+|    Flutter Android Mobile App      |       |        Web Admin Dashboard         |
+|         (Customer Portal)          |       |     (Store Operator / Manager)     |
++-----------------+------------------+       +-----------------+------------------+
+                  |                                            |
+                  | HTTPS REST (GET, POST, PUT, PATCH, DELETE) | HTTPS REST (fetch)
+                  v                                            v
++---------------------------------------------------------------------------------+
+|                       Google Firebase Cloud Services                            |
+|                                                                                 |
+|   +-------------------------------------------------------------------------+   |
+|   |         Firebase Realtime Database (dailydough-5480d-default-rtdb)       |   |
+|   |                                                                         |   |
+|   |   /users            -> User credentials, authorization roles            |   |
+|   |   /user_profiles    -> Customer profiles and saved delivery addresses   |   |
+|   |   /customers        -> Administrative customer directory                |   |
+|   |   /products         -> Donut and beverage catalog (14 items)            |   |
+|   |   /orders           -> Primary customer purchase orders                 |   |
+|   |   /transactions     -> Dual-write financial sales & order audit records |   |
+|   |   /carts/{username} -> User-isolated active shopping cart persistence   |   |
+|   +-------------------------------------------------------------------------+   |
+|                                                                                 |
+|   +-------------------------------------------------------------------------+   |
+|   |         Google Identity Platform (OAuth 2.0 Google Sign-In)             |   |
+|   +-------------------------------------------------------------------------+   |
++---------------------------------------------------------------------------------+
+      </pre>
+    </div>
+
+    <h2>3. Technology Stack Summary</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Technology</th>
+          <th>Implementation in Daily Dough</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Mobile Frontend</strong></td>
+          <td>Flutter SDK / Dart 3.x</td>
+          <td>Native Android mobile app (<code>mobile_app/</code>) with 4-tab bottom navigation, clean treats grid, and Hero animations.</td>
+        </tr>
+        <tr>
+          <td><strong>Web Frontend</strong></td>
+          <td>HTML5, CSS3, Vanilla JS</td>
+          <td>Responsive single-page Web Admin Dashboard (<code>web_dashboard/</code>) with KPI metrics and live order controls.</td>
+        </tr>
+        <tr>
+          <td><strong>Cloud Database</strong></td>
+          <td>Firebase Realtime Database</td>
+          <td>Cloud NoSQL flat JSON tree storing credentials, catalogs, carts, orders, and sales records.</td>
+        </tr>
+        <tr>
+          <td><strong>Authentication</strong></td>
+          <td>Firebase Auth & Google OAuth 2.0</td>
+          <td>Dual authentication supporting email/password accounts and one-tap Google Sign-In.</td>
+        </tr>
+        <tr>
+          <td><strong>State Management</strong></td>
+          <td>Flutter Provider / ChangeNotifier</td>
+          <td>Reactive state synchronization across cart calculations and database polling listeners.</td>
+        </tr>
+        <tr>
+          <td><strong>Build Tooling</strong></td>
+          <td>Gradle 9.3.1 / Android SDK</td>
+          <td>Builds optimized release APK (<code>app-release.apk</code>, ~57.1 MB) with official Daily Dough branding.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. Firebase Realtime Database Structure</h2>
+    <p>Live analysis of the Firebase root at <code>https://dailydough-5480d-default-rtdb.firebaseio.com/</code> confirms 7 distinct data nodes:</p>
+
+    <div class="diagram-card">
+      <div class="diagram-title">Firebase Realtime Database JSON Tree Hierarchy</div>
+      <pre>
+dailydough-5480d-default-rtdb/
+├── users/
+│   └── &lt;userId_or_pushKey&gt;/
+│       ├── authProvider : "password" | "google"
+│       ├── email        : "customer@example.com"
+│       ├── fullName     : "John Doe"
+│       ├── password     : "[PROTECTED]"
+│       ├── role         : "customer" | "admin"
+│       └── username     : "johndoe"
+├── user_profiles/
+│   └── &lt;sanitized_username&gt;/
+│       ├── fullName  : "John Doe"
+│       ├── email     : "customer@example.com"
+│       ├── phone     : "09171234567"
+│       └── addresses : [{"address": "123 Main St", "label": "Home", "isDefault": true}]
+├── customers/
+│   └── &lt;customerPushId&gt;/
+│       ├── fullName, email, phone, username, createdAt, accountType
+├── products/
+│   ├── treat_pistachio/
+│   │   ├── name : "Pistachio", price: 49.0, stock: 50, imageUrl: "...", details: "..."
+│   └── &lt;productId&gt;/ ... (14 treats & coffee items)
+├── orders/
+│   └── &lt;orderId_or_pushKey&gt;/
+│       ├── orderId, customerName, username, userId, totalAmount, paymentMethod, status, timestamp
+│       └── items : [{"name": "Pistachio", "price": 49.0, "quantity": 2}]
+├── transactions/
+│   └── &lt;sharedKey&gt;/ (Identical mirrored structure to /orders for sales auditing)
+└── carts/
+    └── &lt;username&gt;/
+        └── &lt;cartItemPushId&gt;/
+            ├── productName : "Pistachio"
+            └── price       : 49.0
+      </pre>
+    </div>
+
+    <h2>5. Verified Implementation Status Matrix</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Feature / Component</th>
+          <th>Actual Status</th>
+          <th>Source Evidence</th>
+          <th>Functional Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Customer Registration</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>register_screen.dart</code></td>
+          <td>Validates input rules; writes records to <code>/users</code> and <code>/customers</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Customer Login</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>login_screen.dart</code></td>
+          <td>Credential authentication with dynamic password visibility toggle.</td>
+        </tr>
+        <tr>
+          <td><strong>Google Sign-In</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>login_screen.dart</code></td>
+          <td>One-tap OAuth 2.0 authentication using Google Play Services.</td>
+        </tr>
+        <tr>
+          <td><strong>Treats Tab Clean Browsing</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>products_screen.dart</code></td>
+          <td>Clean 2-column grid showing only product image and name without inline cart clutter.</td>
+        </tr>
+        <tr>
+          <td><strong>Product Detail Interface</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>product_detail_screen.dart</code></td>
+          <td>Hero image transition, pricing, culinary description, quantity controls (-/+), Add to Cart.</td>
+        </tr>
+        <tr>
+          <td><strong>Shopping Cart</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>cart_screen.dart</code></td>
+          <td>Groups items by name, calculates subtotal and delivery fee, clear cart safeguard.</td>
+        </tr>
+        <tr>
+          <td><strong>Checkout & Payment</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>checkout_screen.dart</code></td>
+          <td>Address selection, Cash on Delivery, and GCash reference number submission.</td>
+        </tr>
+        <tr>
+          <td><strong>5-Stage Order Tracking</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>order_tracking_screen.dart</code></td>
+          <td>Real-time progress tracker: Placed -> Preparing -> Ready -> Out for Delivery -> Delivered.</td>
+        </tr>
+        <tr>
+          <td><strong>Admin KPI Dashboard</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>web_dashboard/app.js</code></td>
+          <td>Computes live Total Sales, Orders Count, Active Customers, and Catalog Count.</td>
+        </tr>
+        <tr>
+          <td><strong>Admin Orders Management</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>web_dashboard/app.js</code></td>
+          <td>Dual-node PATCH to <code>/orders</code> and <code>/transactions</code> ensuring 100% status persistence.</td>
+        </tr>
+        <tr>
+          <td><strong>Admin Catalog Management</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>web_dashboard/admin.html</code></td>
+          <td>Add New Product modal, inline price/stock editor, deletion safeguard.</td>
+        </tr>
+        <tr>
+          <td><strong>Admin Customer Directory</strong></td>
+          <td><span class="badge badge-green">Completed</span></td>
+          <td><code>web_dashboard/admin.html</code></td>
+          <td>Complete list of registered customers, contact info, and lifetime order counts.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>6. Academic Analysis: Cloud Firestore vs. Realtime Database</h2>
+    <div class="callout">
+      <div class="callout-title">Key Defense Talking Point for ITE 7 Curriculum</div>
+      The ITE 7 academic module references Cloud Firestore collections and documents. However, Daily Dough was engineered using Firebase Realtime Database (RTDB). Both products are official Google Firebase NoSQL solutions. RTDB was selected because its flat JSON tree structure provides sub-second reactive updates for active cart calculations and on-demand order fulfillment tracking, while minimizing client APK size (~57.1 MB) by avoiding heavy native client SDK dependencies.
+    </div>
+
+    <h2>7. Conclusion</h2>
+    <p>Daily Dough represents a fully realized, defensible, production-grade e-commerce application. By seamlessly uniting a Flutter mobile client and an HTML5/JavaScript administrative portal through Google Firebase Realtime Database, it exemplifies best practices in reactive state management, asynchronous REST communication, and transactional data integrity.</p>
+  </div>
+</body>
+</html>
