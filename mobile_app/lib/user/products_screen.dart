@@ -170,7 +170,6 @@ class ProductsScreen extends StatefulWidget {
 
 class _ProductsScreenState extends State<ProductsScreen> {
   late int _currentIndex;
-  final Map<String, int> _selectedQuantities = {};
 
   @override
   void initState() {
@@ -1735,7 +1734,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           crossAxisCount: 2,
           crossAxisSpacing: 14,
           mainAxisSpacing: 14,
-          childAspectRatio: 0.63,
+          childAspectRatio: 0.92,
         ),
         itemBuilder: (context, index) {
           final item = treats[index];
@@ -1746,10 +1745,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Widget _buildTreatCard(TreatItem item) {
-    final cartQty = widget.firebaseService.getProductQuantity(item.name);
-    final localQty = _selectedQuantities[item.name] ?? cartQty;
-    final isConfirmed = (localQty == cartQty) && (cartQty > 0);
-
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -1776,165 +1771,33 @@ class _ProductsScreenState extends State<ProductsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-            SizedBox(
-              height: 92,
-              child: _buildTreatItemImage(item.assetPath),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              item.name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
-                height: 1.2,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '₱${item.price.toInt()}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF94A3B8),
-              ),
-            ),
-            const SizedBox(height: 10),
-            if (localQty == 0)
-              SizedBox(
-                height: 32,
-                child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedQuantities[item.name] = 1;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF83256),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.add, size: 17, color: Colors.white),
-                      SizedBox(width: 4),
-                      Icon(Icons.shopping_cart_rounded, size: 15, color: Colors.white),
-                    ],
+              Expanded(
+                child: Center(
+                  child: Hero(
+                    tag: 'treat_${item.name}',
+                    child: _buildTreatItemImage(item.assetPath),
                   ),
                 ),
-              )
-            else
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InkWell(
-                    onTap: () async {
-                      final newQty = localQty - 1;
-                      setState(() {
-                        _selectedQuantities[item.name] = newQty;
-                      });
-                      if (newQty == 0 && cartQty > 0) {
-                        final prod = Product(
-                          id: 'treat_${item.name.toLowerCase().replaceAll(' ', '_')}',
-                          name: item.name,
-                          price: item.price,
-                          imageUrl: item.assetPath,
-                        );
-                        await widget.firebaseService.setProductQuantity(prod, 0);
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF83256),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.remove, size: 18, color: Colors.white),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
-                      '$localQty',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        _selectedQuantities[item.name] = localQty + 1;
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF83256),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.add, size: 18, color: Colors.white),
-                    ),
-                  ),
-                ],
               ),
-            const SizedBox(height: 6),
-            if (localQty > 0)
-              InkWell(
-                onTap: isConfirmed
-                    ? null
-                    : () async {
-                        final prod = Product(
-                          id: 'treat_${item.name.toLowerCase().replaceAll(' ', '_')}',
-                          name: item.name,
-                          price: item.price,
-                          imageUrl: item.assetPath,
-                        );
-                        await widget.firebaseService.setProductQuantity(prod, localQty);
-                        if (mounted) {
-                          setState(() {});
-                        }
-                      },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: isConfirmed ? const Color(0xFFB2BE33) : const Color(0xFF624B1D),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    'CONFIRM',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+              const SizedBox(height: 8),
+              Text(
+                item.name,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1E293B),
+                  height: 1.2,
                 ),
-              )
-            else
-              const SizedBox(height: 28),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
 
 }

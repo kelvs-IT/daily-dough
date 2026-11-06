@@ -25,9 +25,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Default quantity is existing cart quantity if already in cart, else 1
-    final cartQty = widget.firebaseService.getProductQuantity(widget.item.name);
-    _quantity = cartQty > 0 ? cartQty : 1;
+    _quantity = 1;
   }
 
   Future<void> _handleAddToCart() async {
@@ -41,7 +39,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       imageUrl: widget.item.assetPath,
     );
 
-    await widget.firebaseService.setProductQuantity(prod, _quantity);
+    final currentQty = widget.firebaseService.getProductQuantity(widget.item.name);
+    final targetQty = currentQty + _quantity;
+    await widget.firebaseService.setProductQuantity(prod, targetQty);
 
     if (!mounted) return;
 
